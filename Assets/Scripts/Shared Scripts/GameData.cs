@@ -1,0 +1,108 @@
+using System;
+using System.Collections.Generic;
+using Unity.Netcode;
+
+namespace Castling.Shared
+{
+    public enum PieceType
+    {
+        None = 0,
+        King = 1,
+        Queen = 2,
+        Bishop = 3,
+        Knight = 4,
+        Rook = 5,
+        Pawn = 6
+    }
+
+    public class Piece : INetworkSerializable
+    {
+        public PieceType Type = PieceType.None;
+        public string UID;
+
+        public void NetworkSerialize<T>(BufferSerializer<T> serializer) where T : IReaderWriter
+        {
+            // `PieceType` enum을 `int`로 직렬화
+            int enumValue = (int)Type;
+            serializer.SerializeValue(ref enumValue);
+
+            // 역직렬화 시 `enum`으로 변환
+            if (!serializer.IsWriter)
+            {
+                Type = (PieceType)enumValue;
+            }
+
+            serializer.SerializeValue(ref UID);
+        }
+    }
+
+    public class Tile : INetworkSerializable
+    {
+        public Piece? Piece;
+
+        public void NetworkSerialize<T>(BufferSerializer<T> serializer) where T : IReaderWriter
+        {
+            bool hasPiece = Piece != null;
+            serializer.SerializeValue(ref hasPiece);
+
+            if (hasPiece)
+            {
+                if (!serializer.IsWriter && Piece == null)
+                {
+                    Piece = new Piece();
+                }
+
+                Piece?.NetworkSerialize(serializer);
+            }
+        }
+    }
+
+    public class GameData : INetworkSerializable
+    {
+        public List<List<Tile>> Board = new();
+
+        public void NetworkSerialize<T>(BufferSerializer<T> serializer) where T : IReaderWriter
+        {
+            // 1. 리스트의 외부 크기(행 수) 직렬화
+            int outerCount = Board.Count;
+            serializer.SerializeValue(ref outerCount);
+
+            // 2. 직렬화 중일 때는 Board 초기화 필요 (Deserialize 과정)
+            if (!serializer.IsWriter)
+            {
+                Board = new List<List<Tile>>(outerCount);
+            }
+
+            for (int i = 0; i < outerCount; i++)
+            {
+                // 3. 내부 리스트가 null 일 경우 초기화
+                if (serializer.IsReader && Board.Count <= i)
+                {
+                    Board.Add(new List<Tile>());
+                }
+
+                // 4. 내부 리스트(열)의 크기 직렬화
+                int innerCount = serializer.IsWriter ? Board[i].Count : 0;
+                serializer.SerializeValue(ref innerCount);
+
+                // 5. 내부 리스트 요소 직렬화
+                if (serializer.IsReader)
+                {
+                    Board[i] = new List<Tile>(innerCount);
+                }
+
+                for (int j = 0; j < innerCount; j++)
+                {
+                    Tile value = serializer.IsWriter ? Board[i][j] : new Tile();
+                    serializer.SerializeValue(ref value);
+
+                    if (serializer.IsReader)
+                    {
+                        Board[i].Add(value);
+                    }
+                }
+
+            }
+        }
+    }
+}
