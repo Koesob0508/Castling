@@ -59,10 +59,16 @@ namespace Castling.Shared
 
     public class GameData : INetworkSerializable
     {
+        public ulong BlackClientID;
+        public ulong WhiteClientID;
         public List<List<Tile>> Board = new();
 
         public void NetworkSerialize<T>(BufferSerializer<T> serializer) where T : IReaderWriter
         {
+            // 0. BlackClientID와 WhiteClientID 직렬화
+            serializer.SerializeValue(ref BlackClientID);
+            serializer.SerializeValue(ref WhiteClientID);
+
             // 1. 리스트의 외부 크기(행 수) 직렬화
             int outerCount = Board.Count;
             serializer.SerializeValue(ref outerCount);
