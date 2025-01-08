@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Runtime.CompilerServices;
 using TMPro;
 using Unity.Collections;
 using Unity.Netcode;
@@ -6,7 +7,21 @@ using UnityEngine;
 
 public class Managers : MonoBehaviour
 {
+    private static Managers instance;
+    public Camera CameraWhite;
+    public Camera CameraBlack;
+
+    public GameObject InitUI;
+
     public TMP_Text message;
+
+    public static Managers Instance => instance;
+
+    private void Awake()
+    {
+        instance = this;
+    }
+
     public void StartServer()
     {
         // NetworkManager.Singleton.StartServer();
