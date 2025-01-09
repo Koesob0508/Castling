@@ -16,16 +16,12 @@ public class Managers : MonoBehaviour
 
     public TMP_Text message;
 
-    private int boardXSize;
-    private int boardYSize;
+    private BoardEntity board;
 
-    private Vector2 boardSize;
 
-    
     public static Managers Instance => instance;
-    public int BoardXSize { get => boardXSize; private set => boardXSize = value; }
-    public int BoardYSize { get => boardYSize; private set => boardYSize = value; }
-    public Vector2 BoardSize { get => boardSize; set => boardSize = value; }
+
+    public BoardEntity Board { get => board; set => board = value; }
 
     private void Awake()
     {

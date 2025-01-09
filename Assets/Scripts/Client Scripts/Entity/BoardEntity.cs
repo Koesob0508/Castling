@@ -16,9 +16,10 @@ public class BoardEntity : MonoBehaviour
     [SerializeField]
     private List<PieceEntity> pieces;
 
-    public void Start()
+    public void Awake()
     {
         tiles = new TileEntity[xSize, ySize];
+        Managers.Instance.Board = this;
         CreateBoard();
         CreatePieces();
     }
@@ -35,13 +36,14 @@ public class BoardEntity : MonoBehaviour
         {
             for (int y = 0; y < ySize; y++)
             {
-                TileEntity tile;
+                TileEntity tilePrefab;
 
                 if ((x + y) % 2 == 0)
-                    tile = Instantiate(TileBlack, transform);
+                    tilePrefab = Resources.Load<TileEntity>($"Prefabs/Tile_Black");
                 else
-                    tile = Instantiate(TileWhite, transform);
+                    tilePrefab = Resources.Load<TileEntity>($"Prefabs/Tile_White");
 
+                TileEntity tile = Instantiate(tilePrefab, transform);
                 tile.Init(x, y);
                 tile.name = $"Tile ({x},{y})";
                 tile.transform.position = new Vector3(x, 0, y);
@@ -86,13 +88,10 @@ public class BoardEntity : MonoBehaviour
         PieceEntity piece = Instantiate(piecePrefab);
         piece.UID = UID;
         piece.Color = color;
+        piece.X = x;
+        piece.Y = y;
         piece.transform.parent = tiles[x, y].transform;
         piece.transform.localPosition = new Vector3(0, 1, 0);
-    }
-
-    private void MovePiece(string UID, int toX, int toY)
-    {
-
     }
 
     public void ShowMoveableTiles(List<Vector2Int> positions)

@@ -6,6 +6,7 @@ using UnityEngine.Rendering;
 
 public class PieceEntity : MonoBehaviour
 {
+    private BoardEntity board;
     private PieceType pieceID = 0;
     private string uid = string.Empty;
     private eColor color;
@@ -18,6 +19,27 @@ public class PieceEntity : MonoBehaviour
     public int X { get => x; set => x = value; }
     public int Y { get => y; set => y = value; }
 
+    private void Start()
+    {
+        board = Managers.Instance.Board;
+    }
+
+
+    public virtual List<Vector2Int> GetMoveablePositions()
+    {
+        List<Vector2Int> moveablePositions = new()
+        {
+            new Vector2Int(X - 1, Y),
+            new Vector2Int(X - 2, Y)
+        };
+
+        return moveablePositions;
+    }
+
+    public void Move(Vector2Int targetPosition)
+    {
+        
+    }
 }
 
 public enum eColor
