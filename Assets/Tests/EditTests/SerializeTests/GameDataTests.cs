@@ -12,11 +12,12 @@ namespace Castling.Tests
         [Test]
         public void GameData_SerializeDeserialize_Test()
         {
-            // 1. Å×½ºÆ®¿ë GameData »ı¼º
+            // 1. í…ŒìŠ¤íŠ¸ìš© GameData ìƒì„±
             GameData originalGameData = new GameData
             {
                 BlackClientID = 12345,
                 WhiteClientID = 67890,
+                CurrentClientID = 12345,
                 Board = new Board
                 {
                     xSize = 8,
@@ -38,20 +39,21 @@ namespace Castling.Tests
                 }
             }
 
-            // 2. Á÷·ÄÈ­
+            // 2. ì§ë ¬í™”
             using (FastBufferWriter writer = new FastBufferWriter(4096, Allocator.Temp))
             {
                 writer.WriteNetworkSerializable(originalGameData);
 
-                // 3. ¿ªÁ÷·ÄÈ­
+                // 3. ì—­ì§ë ¬í™”
                 using (FastBufferReader reader = new FastBufferReader(writer, Allocator.Temp))
                 {
                     GameData deserializedGameData = new GameData();
                     reader.ReadNetworkSerializable(out deserializedGameData);
 
-                    // 4. °ËÁõ
+                    // 4. ê²€ì¦
                     Assert.AreEqual(originalGameData.BlackClientID, deserializedGameData.BlackClientID, "BlackClientID mismatch");
                     Assert.AreEqual(originalGameData.WhiteClientID, deserializedGameData.WhiteClientID, "WhiteClientID mismatch");
+                    Assert.AreEqual(originalGameData.CurrentClientID, deserializedGameData.CurrentClientID, "CurrentClientID mismatch");
 
                     Assert.IsNotNull(deserializedGameData.Board, "Board should not be null");
                     Assert.AreEqual(originalGameData.Board.xSize, deserializedGameData.Board.xSize, "Board xSize mismatch");

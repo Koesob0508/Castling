@@ -19,6 +19,7 @@ namespace Castling.Server
             Players = playerInfos;
 
             Logic = new DefaultGameLogic(Players[0].ClientID, Players[1].ClientID);
+
             Logic.OnGameStarted += SendGameStarted;
             Logic.OnGameEnded += SendGameEnded;
             Logic.OnTurnChanged += SendTurnChanged;

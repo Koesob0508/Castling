@@ -102,7 +102,32 @@ namespace Castling.Server
         // 말 배치 메서드
         private void PlacePiece(Board board, TeamColor color, PieceType type, int x, int y, string uid)
         {
-            Piece piece = new Piece { Logic = this, Color = color, Type = type, UID = uid, Position = new Vector2Int(x, y) };
+            Piece piece = null;
+            switch (type)
+            {
+                case PieceType.None:
+                    Debug.LogWarning("None type piece found.");
+                    break;
+                case PieceType.King:
+                    piece = new King { Logic = this, Color = color, Type = type, UID = uid, Position = new Vector2Int(x, y) };
+                    break;
+                case PieceType.Queen:
+                    piece = new Queen { Logic = this, Color = color, Type = type, UID = uid, Position = new Vector2Int(x, y) };
+                    break;
+                case PieceType.Bishop:
+                    piece = new Bishop { Logic = this, Color = color, Type = type, UID = uid, Position = new Vector2Int(x, y) };
+                    break;
+                case PieceType.Knight:
+                    piece = new Knight { Logic = this, Color = color, Type = type, UID = uid, Position = new Vector2Int(x, y) };
+                    break;
+                case PieceType.Rook:
+                    piece = new Rook { Logic = this, Color = color, Type = type, UID = uid, Position = new Vector2Int(x, y) };
+                    break;
+                case PieceType.Pawn:
+                    piece = new Pawn { Logic = this, Color = color, Type = type, UID = uid, Position = new Vector2Int(x, y) };
+                    break;
+            }
+
             board.Pieces.Add(piece);
             board.Tiles[x, y].Piece = piece;
         }
@@ -140,6 +165,7 @@ namespace Castling.Server
             }
 
             OnMoveSucceeded?.Invoke();
+
             // 턴 교체
             ChangeTurn();
         }
@@ -178,6 +204,7 @@ namespace Castling.Server
         // 이동 가능성 검사 메서드 (기초 구현)
         private bool IsMoveValid(Piece piece, Vector2Int from, Vector2Int to)
         {
+            if (piece is Pawn) Debug.Log("Null");
             List<Vector2Int> validMoves = piece.GetMoveableTiles(from.x, from.y).ConvertAll(tile => tile.Position);
             return validMoves.Contains(to);
         }
