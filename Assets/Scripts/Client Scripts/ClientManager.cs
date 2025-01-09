@@ -60,13 +60,10 @@ public class ClientManager
                 break;
             case CommandType.MovePieceResult:
                 reader.ReadValueSafe(out bool result);
-                Debug.Log("movepieceresult");
-                Debug.Log(result);
                 if (result)
                 {
-                    reader.ReadValueSafe(out string uid);
                     reader.ReadValueSafe(out gameData);
-                    MovePieceResult(uid, gameData);
+                    MovePieceResult(gameData);
                 }
                 break;
         }
@@ -77,10 +74,8 @@ public class ClientManager
         Managers.Instance.GameStart(gameData);
     }
 
-    private void MovePieceResult(string uid, GameData gameData)
+    private void MovePieceResult(GameData gameData)
     {
-        Debug.Log("MovePieceResult");
-
         Managers.Instance.GameData = gameData;
         Managers.Instance.Board.MovePieceResult
             (gameData.Board.Pieces.ToDictionary(x => x.UID, x => x));

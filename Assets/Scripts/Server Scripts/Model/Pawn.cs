@@ -6,6 +6,7 @@ public class Pawn : Piece
 {
     public override List<Tile> GetMoveableTiles(GameData gameData, int currentX, int currentY)
     {
+        Debug.Log("Pawn" + gameData.ToString());
         List<Tile> moveableTiles = new List<Tile>();
 
         // 현재 폰의 방향: 화이트는 위로(감소), 블랙은 아래로(증가)

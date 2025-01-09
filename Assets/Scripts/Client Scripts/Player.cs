@@ -29,6 +29,9 @@ public class Player : MonoBehaviour
 
     private void Update()
     {
+        // gamedata 에는 직전 행동의 정보가 담김.
+        // if (Managers.Instance.GameData.CurrentClientID == clientID) return;
+
         // 마우스 클릭 입력
         if (Input.GetMouseButtonDown(0))
         {
