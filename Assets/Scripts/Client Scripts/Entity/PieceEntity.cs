@@ -38,24 +38,24 @@ public class PieceEntity : MonoBehaviour
         switch (pieceType)
         {
             case PieceType.None:
+                break;
             case PieceType.Pawn:
-            default:
-                pieceModel = new Pawn();
+                pieceModel = new Pawn() { Color = color };
                 break;
             case PieceType.King:
-                pieceModel = new King();
+                pieceModel = new King() { Color = color };
                 break;
             case PieceType.Queen:
-                pieceModel = new Queen();
+                pieceModel = new Queen() { Color = color };
                 break;
             case PieceType.Bishop:
-                pieceModel = new Bishop();
+                pieceModel = new Bishop() { Color = color };
                 break;
             case PieceType.Knight:
-                pieceModel = new Knight();
+                pieceModel = new Knight() { Color = color };
                 break;
             case PieceType.Rook:
-                pieceModel = new Rook();
+                pieceModel = new Rook() { Color = color };
                 break;
         }
     }
