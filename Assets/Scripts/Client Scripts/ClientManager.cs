@@ -15,10 +15,34 @@ public class ClientManager
     public void Init()
     {
         network = NetworkManager.Singleton;
-        network.CustomMessagingManager.RegisterNamedMessageHandler("FromServer", OnReceivedServerMessage);
-        
+
         if (Instance == null)
             clientManager = this;
+
+        network.OnClientConnectedCallback += OnConnect;
+    }
+
+    private void OnConnect(ulong clientID)
+    {
+        if(clientID == network.LocalClientId)
+        {
+            OnMyClientJoin();
+        }
+        else
+        {
+            OnOtherClientJoin(clientID);
+        }
+    }
+
+    private void OnMyClientJoin()
+    {
+        network.CustomMessagingManager.RegisterNamedMessageHandler("FromServer", OnReceivedServerMessage);
+    }
+
+    private void OnOtherClientJoin(ulong clientID)
+    {
+        if(!network.IsHost)
+            Debug.Log("¹º°¡ Àß¸øµÊ");
     }
 
     private void OnReceivedServerMessage(ulong clientID, FastBufferReader reader)

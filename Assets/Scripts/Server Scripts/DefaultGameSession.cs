@@ -58,6 +58,8 @@ namespace Castling.Server
 
         private void SendStartGame()
         {
+            Debug.Log("Start Game");
+
             FastBufferWriter writer = new FastBufferWriter(size: 128, allocator: Unity.Collections.Allocator.Temp);
 
             writer.WriteValueSafe(CommandType.StartGame);
