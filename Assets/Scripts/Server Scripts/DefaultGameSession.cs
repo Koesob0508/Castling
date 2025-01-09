@@ -45,9 +45,16 @@ namespace Castling.Server
             }
         }
 
-        private void TryMovePiece(string pieceUID, int x, int y)
+        private void TryMovePiece(string pieceUID, int destinationX, int destinationY)
         {
-
+            if (Logic.TryMovePiece(pieceUID, destinationX, destinationY))
+            {
+                SendMovePieceResult(true);
+            }
+            else
+            {
+                SendMovePieceResult(false);
+            }
         }
 
         #region Send
@@ -56,7 +63,7 @@ namespace Castling.Server
         {
             Debug.Log("Start Game");
 
-            using (FastBufferWriter writer = new FastBufferWriter(128, allocator: Unity.Collections.Allocator.Temp, 1024 * 1024))
+            using (FastBufferWriter writer = new FastBufferWriter(128, allocator: Unity.Collections.Allocator.Temp, 10240))
             {
                 writer.WriteValueSafe(CommandType.StartGame);
                 writer.WriteNetworkSerializable(Logic.GameData);
@@ -65,16 +72,27 @@ namespace Castling.Server
             }
         }
 
+        private void SendMovePieceResult(bool succeededed)
+        {
+            Debug.Log("Move Piece Result");
+
+            using (FastBufferWriter writer = new FastBufferWriter(128, allocator: Unity.Collections.Allocator.Temp, 10240))
+            {
+                writer.WriteValueSafe(CommandType.MovePieceResult);
+                writer.WriteValueSafe(succeededed);
+                writer.WriteNetworkSerializable(Logic.GameData);
+
+                SendToAll(writer);
+            }
+        }
+
         private void SendToAll(FastBufferWriter writer)
         {
-            foreach(var player in Players)
+            foreach (var player in Players)
             {
                 NetworkManager.Singleton.CustomMessagingManager.SendNamedMessage("FromServer", player.ClientID, writer, NetworkDelivery.ReliableFragmentedSequenced);
             }
         }
-
         #endregion
     }
-
-
 }
