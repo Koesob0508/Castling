@@ -586,8 +586,8 @@ MonoBehaviour:
   CameraWhite: {fileID: 961739752}
   CameraBlack: {fileID: 1418998203}
   InitUI: {fileID: 545467046}
-  ShowJoinCode: {fileID: 735553056}
-  InputJoinCode: {fileID: 183502852}
+  ShowJoinCode: {fileID: 0}
+  InputJoinCode: {fileID: 0}
 --- !u!4 &266714490
 Transform:
   m_ObjectHideFlags: 0
@@ -1210,11 +1210,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 7a4d9dcc7d5fba84595df3f8af6c88d5, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  TileBlack: {fileID: -260983931781128911, guid: fccf381dcbe1a2846aa06bc09bee2d26, type: 3}
-  TileWhite: {fileID: 5034419771296007368, guid: c3699ec3d9e25d142bfef578ab086b7d, type: 3}
+  TileBlack: {fileID: 0}
+  TileWhite: {fileID: 0}
   xSize: 8
   ySize: 8
-  pieces: []
 --- !u!1 &961739749
 GameObject:
   m_ObjectHideFlags: 0
@@ -2540,6 +2539,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: cc330cc1a9ef0b649a275874da6de2c0, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  board: {fileID: 0}
   capturedPiece: {fileID: 0}
   cursor: {fileID: 1231072189}
 --- !u!4 &1926146410

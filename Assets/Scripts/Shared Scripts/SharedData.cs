@@ -16,9 +16,15 @@ namespace Castling.Shared
         Pawn = 6
     }
 
+    public enum TeamColor
+    {
+        Black = 0,
+        White = 1,
+    }
+
     public class Piece : INetworkSerializable
     {
-        public eColor Color;
+        public TeamColor Color;
         public PieceType Type = PieceType.None;
         public string UID;
         public Vector2Int Position;
@@ -34,7 +40,7 @@ namespace Castling.Shared
             // 역직렬화 시 `enum`으로 변환
             if (!serializer.IsWriter)
             {
-                Color = (eColor)colorValue;
+                Color = (TeamColor)colorValue;
                 Type = (PieceType)enumValue;
             }
 

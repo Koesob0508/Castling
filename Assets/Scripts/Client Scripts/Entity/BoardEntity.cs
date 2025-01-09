@@ -1,6 +1,7 @@
 using Castling.Shared;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 using UnityEngine.UIElements;
 
@@ -16,21 +17,85 @@ public class BoardEntity : MonoBehaviour
 
     private TileEntity[,] tiles;
     [SerializeField]
-    private List<PieceEntity> pieces;
+    private Dictionary<string, PieceEntity> pieces = new Dictionary<string, PieceEntity>();
 
     public TileEntity GetTile(Vector2Int position) => tiles[position.x, position.y];
+    public PieceEntity GetPiece(string uid) => pieces[uid];
 
-    public void Awake()
+    public GameData testData;
+
+    private void Start()
     {
-        tiles = new TileEntity[xSize, ySize];
         Managers.Instance.Board = this;
-        CreateBoard();
-        CreatePieces();
     }
 
-    public void Init()
+    public void Init(GameData gameData)
     {
+        xSize = gameData.Board.xSize;
+        ySize = gameData.Board.ySize;
+        tiles = new TileEntity[xSize, ySize];
 
+        CreateBoard();
+        CreatePieces(gameData);
+    }
+
+    public void BoardTestData(string actorID, Vector2Int destination)
+    {
+        testData = new GameData();
+
+        testData.BlackClientID = 0;
+        testData.WhiteClientID = 0;
+
+        testData.Board = new Board();
+        testData.Board.xSize = xSize;
+        testData.Board.ySize = ySize;
+
+        testData.Board.tiles = new Tile[xSize, ySize];
+        for (int i = 0; i < xSize; i++)
+        {
+            for (int j = 0; j < ySize; j++)
+            {
+                Tile tile = new Tile();
+                tile.Position = tiles[i, j].Position;
+
+                testData.Board.tiles[i, j] = tile;
+            }
+        }
+
+        testData.Board.pieces = new List<Piece>();
+        foreach (PieceEntity pieceEntity in pieces.Values)
+        {
+            Piece piece = new Piece();
+
+            if (pieceEntity.UID == actorID)
+            {
+                piece.UID = pieceEntity.UID;
+                piece.Position = destination;
+            }
+            else
+            {
+                piece.UID = pieceEntity.UID;
+                piece.Position = pieceEntity.Position;
+
+                
+            }
+
+            testData.Board.pieces.Add(piece);
+        }
+
+        Piece pie = null;
+        foreach (Piece p in testData.Board.pieces)
+        {
+            if (p.UID != actorID)
+            {
+                if (p.Position == destination)
+                    pie = p;
+            }
+        }
+
+        if (pie != null) testData.Board.pieces.Remove(pie);
+
+        MovePieceResult(testData.Board.pieces.ToDictionary(x => x.UID, x => x));
     }
 
 
@@ -57,28 +122,21 @@ public class BoardEntity : MonoBehaviour
         }
     }
 
-    private void CreatePieces()
+    private void CreatePieces(GameData gameData)
     {
-        CreatePiece("Pawn", Guid.NewGuid().ToString(), PieceType.Pawn, eColor.White, new Vector2Int(1, 0));
-        CreatePiece("Pawn", Guid.NewGuid().ToString(), PieceType.Pawn, eColor.White, new Vector2Int(1, 1));
-        CreatePiece("Pawn", Guid.NewGuid().ToString(), PieceType.Pawn, eColor.White, new Vector2Int(1, 2));
-        CreatePiece("Pawn", Guid.NewGuid().ToString(), PieceType.Pawn, eColor.White, new Vector2Int(1, 3));
-        CreatePiece("Pawn", Guid.NewGuid().ToString(), PieceType.Pawn, eColor.White, new Vector2Int(1, 4));
-        CreatePiece("Pawn", Guid.NewGuid().ToString(), PieceType.Pawn, eColor.White, new Vector2Int(1, 5));
-        CreatePiece("Pawn", Guid.NewGuid().ToString(), PieceType.Pawn, eColor.White, new Vector2Int(1, 6));
-        CreatePiece("Pawn", Guid.NewGuid().ToString(), PieceType.Pawn, eColor.White, new Vector2Int(1, 7));
-                                                       
-        CreatePiece("Pawn", Guid.NewGuid().ToString(), PieceType.Pawn, eColor.Black, new Vector2Int(6, 0));
-        CreatePiece("Pawn", Guid.NewGuid().ToString(), PieceType.Pawn, eColor.Black, new Vector2Int(6, 1));
-        CreatePiece("Pawn", Guid.NewGuid().ToString(), PieceType.Pawn, eColor.Black, new Vector2Int(6, 2));
-        CreatePiece("Pawn", Guid.NewGuid().ToString(), PieceType.Pawn, eColor.Black, new Vector2Int(6, 3));
-        CreatePiece("Pawn", Guid.NewGuid().ToString(), PieceType.Pawn, eColor.Black, new Vector2Int(6, 4));
-        CreatePiece("Pawn", Guid.NewGuid().ToString(), PieceType.Pawn, eColor.Black, new Vector2Int(6, 5));
-        CreatePiece("Pawn", Guid.NewGuid().ToString(), PieceType.Pawn, eColor.Black, new Vector2Int(6, 6));
-        CreatePiece("Pawn", Guid.NewGuid().ToString(), PieceType.Pawn, eColor.Black, new Vector2Int(6, 7));
+        foreach (var piece in gameData.Board.pieces)
+        {
+            string name = piece.Type.ToString();
+            string UID = piece.UID;
+            PieceType pieceType = piece.Type;
+            Vector2Int position = piece.Position;
+            TeamColor color = piece.Color;
+
+            CreatePiece(name, UID, pieceType, color, position);
+        }
     }
 
-    private void CreatePiece(string prefabName, string UID, PieceType pieceID, eColor color, Vector2Int position)
+    private void CreatePiece(string prefabName, string UID, PieceType pieceID, TeamColor color, Vector2Int position)
     {
         string pieceName = $"Piece_{prefabName}_{color}";
         PieceEntity piecePrefab = Resources.Load<PieceEntity>($"Prefabs/{pieceName}");
@@ -93,6 +151,7 @@ public class BoardEntity : MonoBehaviour
         piece.Init(UID, pieceID, color, position);
         piece.transform.parent = tiles[position.x, position.y].transform;
         piece.transform.localPosition = new Vector3(0, 1, 0);
+        pieces.Add(UID, piece);
     }
 
     public void ShowMoveableTiles(List<Vector2Int> positions)
@@ -110,6 +169,28 @@ public class BoardEntity : MonoBehaviour
             for (int y = 0; y < ySize; y++)
             {
                 tiles[x, y].HideMoveableEffect();
+            }
+        }
+    }
+
+    public void MovePieceResult(Dictionary<string, Piece> piecesResult)
+    {
+        Debug.Log("MovePieceResult");
+
+        foreach(var pieceEntityPair in pieces)
+        {
+            if (piecesResult.ContainsKey(pieceEntityPair.Key))
+            {
+                Piece pieceModel = piecesResult[pieceEntityPair.Key];
+                PieceEntity pieceEntity = pieceEntityPair.Value;
+
+                if (pieceEntity.Position != pieceModel.Position)
+                    pieceEntity.Move(pieceModel.Position);
+            }
+            else
+            {
+                PieceEntity pieceEntity = pieceEntityPair.Value;
+                pieceEntity.Die();
             }
         }
     }

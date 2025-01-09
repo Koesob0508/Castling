@@ -15,7 +15,7 @@ namespace Castling.Tests
             // 1. 원본 Piece 객체 생성
             Piece originalPiece = new Piece
             {
-                Color = eColor.White,
+                Color = TeamColor.White,
                 Type = PieceType.King,
                 UID = "piece_123",
                 Position = new Vector2Int(3, 5)

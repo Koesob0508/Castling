@@ -1,3 +1,4 @@
+using Castling.Shared;
 using NUnit.Framework;
 using System.Collections.Generic;
 using System.Linq;
@@ -10,7 +11,7 @@ using UnityEngine.Rendering;
 public class Player : MonoBehaviour
 {
     private ulong clientID;
-    private eColor color;
+    private TeamColor color;
 
     [SerializeField]
     private BoardEntity board;
@@ -24,7 +25,7 @@ public class Player : MonoBehaviour
         board = Managers.Instance.Board;
     }
 
-    public void Init(ulong clientID, eColor color)
+    public void Init(ulong clientID, TeamColor color)
     {
         this.clientID = clientID;
         this.color = color;
@@ -69,9 +70,14 @@ public class Player : MonoBehaviour
                             //UnCapturePiece();
 
                             // 서버에게 전송하기
-                            ClientManager.Instance.SendTryMovePiece(capturedPiece.UID, targetPosition);
+                            //Managers.Instance.Client.SendTryMovePiece(capturedPiece.UID, targetPosition);
+
+                            // 테스트 중
+                            board.BoardTestData(capturedPiece.UID, targetPosition);
                         }
                     }
+
+                    UnCapturePiece();
                 }
                 else
                 {
@@ -96,9 +102,8 @@ public class Player : MonoBehaviour
         if (capturedPiece) UnCapturePiece();
         capturedPiece = piece;
 
-        Vector3 cursorPosition = piece.transform.position;
-        cursorPosition.y += 1.5f;
-        cursor.transform.position = cursorPosition;
+        cursor.transform.parent = capturedPiece.transform;
+        cursor.transform.localPosition = new Vector3(0, 1.2f, 0);
         cursor.SetActive(true);
 
         List<Vector2Int> moveablePositions = capturedPiece.GetMoveablePositions();

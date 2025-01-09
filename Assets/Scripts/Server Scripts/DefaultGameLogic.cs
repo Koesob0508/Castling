@@ -61,27 +61,27 @@ namespace Castling.Server
             }
 
             // 주요 기물 (양 끝줄)
-            PlacePiece(board, eColor.Black, PieceType.Rook, 0, 0, "black_rook_0");
-            PlacePiece(board, eColor.Black, PieceType.Rook, 7, 0, "black_rook_1");
-            PlacePiece(board, eColor.Black, PieceType.Knight, 1, 0, "black_knight_0");
-            PlacePiece(board, eColor.Black, PieceType.Knight, 6, 0, "black_knight_1");
-            PlacePiece(board, eColor.Black, PieceType.Bishop, 2, 0, "black_bishop_0");
-            PlacePiece(board, eColor.Black, PieceType.Bishop, 5, 0, "black_bishop_1");
-            PlacePiece(board, eColor.Black, PieceType.Queen, 3, 0, "black_queen");
-            PlacePiece(board, eColor.Black, PieceType.King, 4, 0, "black_king");
+            PlacePiece(board, TeamColor.Black, PieceType.Rook, 0, 0, "black_rook_0");
+            PlacePiece(board, TeamColor.Black, PieceType.Rook, 7, 0, "black_rook_1");
+            PlacePiece(board, TeamColor.Black, PieceType.Knight, 1, 0, "black_knight_0");
+            PlacePiece(board, TeamColor.Black, PieceType.Knight, 6, 0, "black_knight_1");
+            PlacePiece(board, TeamColor.Black, PieceType.Bishop, 2, 0, "black_bishop_0");
+            PlacePiece(board, TeamColor.Black, PieceType.Bishop, 5, 0, "black_bishop_1");
+            PlacePiece(board, TeamColor.Black, PieceType.Queen, 3, 0, "black_queen");
+            PlacePiece(board, TeamColor.Black, PieceType.King, 4, 0, "black_king");
 
-            PlacePiece(board, eColor.White, PieceType.Rook, 0, 7, "white_rook_0");
-            PlacePiece(board, eColor.White, PieceType.Rook, 7, 7, "white_rook_1");
-            PlacePiece(board, eColor.White, PieceType.Knight, 1, 7, "white_knight_0");
-            PlacePiece(board, eColor.White, PieceType.Knight, 6, 7, "white_knight_1");
-            PlacePiece(board, eColor.White, PieceType.Bishop, 2, 7, "white_bishop_0");
-            PlacePiece(board, eColor.White, PieceType.Bishop, 5, 7, "white_bishop_1");
-            PlacePiece(board, eColor.White, PieceType.Queen, 3, 7, "white_queen");
-            PlacePiece(board, eColor.White, PieceType.King, 4, 7, "white_king");
+            PlacePiece(board, TeamColor.White, PieceType.Rook, 0, 7, "white_rook_0");
+            PlacePiece(board, TeamColor.White, PieceType.Rook, 7, 7, "white_rook_1");
+            PlacePiece(board, TeamColor.White, PieceType.Knight, 1, 7, "white_knight_0");
+            PlacePiece(board, TeamColor.White, PieceType.Knight, 6, 7, "white_knight_1");
+            PlacePiece(board, TeamColor.White, PieceType.Bishop, 2, 7, "white_bishop_0");
+            PlacePiece(board, TeamColor.White, PieceType.Bishop, 5, 7, "white_bishop_1");
+            PlacePiece(board, TeamColor.White, PieceType.Queen, 3, 7, "white_queen");
+            PlacePiece(board, TeamColor.White, PieceType.King, 4, 7, "white_king");
         }
 
         // 말 배치 메서드
-        private void PlacePiece(Board board, eColor color, PieceType type, int x, int y, string uid)
+        private void PlacePiece(Board board, TeamColor color, PieceType type, int x, int y, string uid)
         {
             Piece piece = new Piece { Color = color, Type = type, UID = uid, Position = new Vector2Int(x, y) };
             board.pieces.Add(piece);

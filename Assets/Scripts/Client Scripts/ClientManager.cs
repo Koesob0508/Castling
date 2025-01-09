@@ -9,16 +9,10 @@ using UnityEngine;
 public class ClientManager
 {
     private NetworkManager network;
-    private static ClientManager clientManager;
-    public static ClientManager Instance;
 
     public void Init()
     {
         network = NetworkManager.Singleton;
-
-        if (Instance == null)
-            clientManager = this;
-
         network.OnClientConnectedCallback += OnConnect;
     }
 
@@ -79,20 +73,22 @@ public class ClientManager
         Player player = GameObject.Find("Player").GetComponent<Player>();
         if (gameData.BlackClientID == network.LocalClientId)
         {
-            player.Init(gameData.BlackClientID, eColor.Black);
+            player.Init(gameData.BlackClientID, TeamColor.Black);
             Managers.Instance.CameraBlack.gameObject.SetActive(true);
             Managers.Instance.CameraWhite.gameObject.SetActive(false);
         }
         else if (gameData.WhiteClientID == network.LocalClientId)
         {
-            player.Init(gameData.WhiteClientID, eColor.White);
+            player.Init(gameData.WhiteClientID, TeamColor.White);
             Managers.Instance.CameraBlack.gameObject.SetActive(false);
             Managers.Instance.CameraWhite.gameObject.SetActive(true);
         }
         else
         {
-            UnityEngine.Debug.LogError("Client ID Error!");
+            Debug.LogError("Client ID Error!");
         }
+
+        Managers.Instance.Board.Init(gameData);
 
     }
 
