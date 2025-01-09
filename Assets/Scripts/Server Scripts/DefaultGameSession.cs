@@ -56,10 +56,10 @@ namespace Castling.Server
         {
             Debug.Log("Start Game");
 
-            using (FastBufferWriter writer = new FastBufferWriter(size: 4096, allocator: Unity.Collections.Allocator.Temp))
+            using (FastBufferWriter writer = new FastBufferWriter(128, allocator: Unity.Collections.Allocator.Temp, 1024 * 1024))
             {
                 writer.WriteValueSafe(CommandType.StartGame);
-                writer.WriteValueSafe(Logic.GameData);
+                writer.WriteNetworkSerializable(Logic.GameData);
 
                 SendToAll(writer);
             }
@@ -69,7 +69,7 @@ namespace Castling.Server
         {
             foreach(var player in Players)
             {
-                NetworkManager.Singleton.CustomMessagingManager.SendNamedMessage("FromServer", player.ClientID, writer, NetworkDelivery.ReliableSequenced);
+                NetworkManager.Singleton.CustomMessagingManager.SendNamedMessage("FromServer", player.ClientID, writer, NetworkDelivery.ReliableFragmentedSequenced);
             }
         }
 
