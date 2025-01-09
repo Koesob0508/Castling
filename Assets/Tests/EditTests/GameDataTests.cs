@@ -21,8 +21,8 @@ namespace Castling.Tests
                 {
                     xSize = 8,
                     ySize = 8,
-                    tiles = new Tile[8, 8],
-                    pieces = new List<Piece>
+                    Tiles = new Tile[8, 8],
+                    Pieces = new List<Piece>
             {
                 new Piece { Type = PieceType.King, UID = "king_1", Position = new Vector2Int(0, 0) },
                 new Piece { Type = PieceType.Queen, UID = "queen_1", Position = new Vector2Int(1, 1) }
@@ -34,7 +34,7 @@ namespace Castling.Tests
             {
                 for (int j = 0; j < 8; j++)
                 {
-                    originalGameData.Board.tiles[i, j] = new Tile { Position = new Vector2Int(i, j) };
+                    originalGameData.Board.Tiles[i, j] = new Tile { Position = new Vector2Int(i, j) };
                 }
             }
 
@@ -56,13 +56,13 @@ namespace Castling.Tests
                     Assert.IsNotNull(deserializedGameData.Board, "Board should not be null");
                     Assert.AreEqual(originalGameData.Board.xSize, deserializedGameData.Board.xSize, "Board xSize mismatch");
                     Assert.AreEqual(originalGameData.Board.ySize, deserializedGameData.Board.ySize, "Board ySize mismatch");
-                    Assert.AreEqual(originalGameData.Board.pieces.Count, deserializedGameData.Board.pieces.Count, "Pieces count mismatch");
+                    Assert.AreEqual(originalGameData.Board.Pieces.Count, deserializedGameData.Board.Pieces.Count, "Pieces count mismatch");
 
-                    for (int i = 0; i < originalGameData.Board.pieces.Count; i++)
+                    for (int i = 0; i < originalGameData.Board.Pieces.Count; i++)
                     {
-                        Assert.AreEqual(originalGameData.Board.pieces[i].Type, deserializedGameData.Board.pieces[i].Type, $"Piece {i} Type mismatch");
-                        Assert.AreEqual(originalGameData.Board.pieces[i].UID, deserializedGameData.Board.pieces[i].UID, $"Piece {i} UID mismatch");
-                        Assert.AreEqual(originalGameData.Board.pieces[i].Position, deserializedGameData.Board.pieces[i].Position, $"Piece {i} Position mismatch");
+                        Assert.AreEqual(originalGameData.Board.Pieces[i].Type, deserializedGameData.Board.Pieces[i].Type, $"Piece {i} Type mismatch");
+                        Assert.AreEqual(originalGameData.Board.Pieces[i].UID, deserializedGameData.Board.Pieces[i].UID, $"Piece {i} UID mismatch");
+                        Assert.AreEqual(originalGameData.Board.Pieces[i].Position, deserializedGameData.Board.Pieces[i].Position, $"Piece {i} Position mismatch");
                     }
                 }
             }

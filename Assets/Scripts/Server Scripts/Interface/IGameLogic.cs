@@ -1,4 +1,5 @@
-﻿using Castling.Shared;
+using System;
+using Castling.Shared;
 
 namespace Castling.Server
 {
@@ -6,6 +7,14 @@ namespace Castling.Server
     {
         GameData GameData { get; }
 
-        bool TryMovePiece(string pieceUID, int destinationX, int destinationY);
+        event Action OnGameStarted;
+        event Action<ulong> OnGameEnded;
+        event Action OnTurnChanged;
+        event Action OnMoveFailed;
+        event Action OnMoveSucceeded;
+
+        void Init();
+        void Clear();
+        void TryMovePiece(string pieceUID, int destinationX, int destinationY);
     }
 }

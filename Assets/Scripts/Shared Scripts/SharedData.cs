@@ -25,6 +25,7 @@ namespace Castling.Shared
 
     public class Piece : INetworkSerializable
     {
+        public IGameLogic Logic;
         public TeamColor Color;
         public PieceType Type = PieceType.None;
         public string UID;
@@ -78,8 +79,8 @@ namespace Castling.Shared
     {
         public int xSize;
         public int ySize;
-        public Tile[,] tiles;
-        public List<Piece> pieces;
+        public Tile[,] Tiles;
+        public List<Piece> Pieces;
 
         public void NetworkSerialize<T>(BufferSerializer<T> serializer) where T : IReaderWriter
         {
@@ -92,31 +93,31 @@ namespace Castling.Shared
                 {
                     for (int j = 0; j < ySize; j++)
                     {
-                        Tile tile = tiles[i, j];
+                        Tile tile = Tiles[i, j];
                         serializer.SerializeNetworkSerializable(ref tile);
                     }
                 }
             }
             else
             {
-                tiles = new Tile[xSize, ySize];
+                Tiles = new Tile[xSize, ySize];
                 for (int i = 0; i < xSize; i++)
                 {
                     for (int j = 0; j < ySize; j++)
                     {
                         Tile tile = new Tile();  // �� Tile �ν��Ͻ� ����
                         serializer.SerializeNetworkSerializable(ref tile);
-                        tiles[i, j] = tile;
+                        Tiles[i, j] = tile;
                     }
                 }
             }
 
-            int piecesCount = pieces?.Count ?? 0;
+            int piecesCount = Pieces?.Count ?? 0;
             serializer.SerializeValue(ref piecesCount);
 
             if (serializer.IsWriter)
             {
-                foreach (Piece piece in pieces)
+                foreach (Piece piece in Pieces)
                 {
                     Piece tempPiece = piece;
                     serializer.SerializeNetworkSerializable(ref tempPiece);
@@ -124,12 +125,12 @@ namespace Castling.Shared
             }
             else
             {
-                pieces = new List<Piece>(piecesCount);
+                Pieces = new List<Piece>(piecesCount);
                 for (int i = 0; i < piecesCount; i++)
                 {
                     Piece piece = new Piece();  // �� Piece �ν��Ͻ� ����
                     serializer.SerializeNetworkSerializable(ref piece);
-                    pieces.Add(piece);
+                    Pieces.Add(piece);
                 }
             }
         }
@@ -140,11 +141,13 @@ namespace Castling.Shared
         public ulong BlackClientID;
         public ulong WhiteClientID;
         public Board Board;
+        public ulong CurrentClientID;
 
         public void NetworkSerialize<T>(BufferSerializer<T> serializer) where T : IReaderWriter
         {
             serializer.SerializeValue(ref BlackClientID);
             serializer.SerializeValue(ref WhiteClientID);
+            serializer.SerializeValue(ref CurrentClientID);
 
             bool hasBoard = Board != null;
             serializer.SerializeValue(ref hasBoard);

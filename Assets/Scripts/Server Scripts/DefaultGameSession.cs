@@ -19,14 +19,20 @@ namespace Castling.Server
             Players = playerInfos;
 
             Logic = new DefaultGameLogic(Players[0].ClientID, Players[1].ClientID);
+            Logic.Init();
 
             NetworkManager.Singleton.CustomMessagingManager.RegisterNamedMessageHandler("FromClient", OnReceivedClientMessage);
 
-            SendStartGame();
+            Logic.OnGameStarted += SendGameStarted;
+            Logic.OnGameEnded += SendGameEnded;
+            Logic.OnTurnChanged += SendTurnChanged;
+            Logic.OnMoveSucceeded += () => SendMovePieceResult(true);
+            Logic.OnMoveFailed += () => SendMovePieceResult(false);
         }
 
         public void Clear()
         {
+            Logic.Clear();
             NetworkManager.Singleton.CustomMessagingManager.UnregisterNamedMessageHandler("FromClient");
         }
 
@@ -47,25 +53,42 @@ namespace Castling.Server
 
         private void TryMovePiece(string pieceUID, int destinationX, int destinationY)
         {
-            if (Logic.TryMovePiece(pieceUID, destinationX, destinationY))
-            {
-                SendMovePieceResult(true);
-            }
-            else
-            {
-                SendMovePieceResult(false);
-            }
+            Logic.TryMovePiece(pieceUID, destinationX, destinationY);
         }
 
         #region Send
 
-        private void SendStartGame()
+        private void SendGameStarted()
         {
             Debug.Log("Start Game");
 
             using (FastBufferWriter writer = new FastBufferWriter(128, allocator: Unity.Collections.Allocator.Temp, 10240))
             {
                 writer.WriteValueSafe(CommandType.StartGame);
+                writer.WriteNetworkSerializable(Logic.GameData);
+
+                SendToAll(writer);
+            }
+        }
+
+        private void SendGameEnded(ulong winnerID)
+        {
+            using (FastBufferWriter writer = new FastBufferWriter(128, allocator: Unity.Collections.Allocator.Temp, 10240))
+            {
+                writer.WriteValueSafe(CommandType.EndGame);
+                writer.WriteValueSafe(winnerID);
+
+                SendToAll(writer);
+            }
+        }
+
+        private void SendTurnChanged()
+        {
+            Debug.Log("Start Game");
+
+            using (FastBufferWriter writer = new FastBufferWriter(128, allocator: Unity.Collections.Allocator.Temp, 10240))
+            {
+                writer.WriteValueSafe(CommandType.ChangeTurn);
                 writer.WriteNetworkSerializable(Logic.GameData);
 
                 SendToAll(writer);

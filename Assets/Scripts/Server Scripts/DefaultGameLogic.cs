@@ -1,4 +1,5 @@
-﻿using Castling.Shared;
+using Castling.Shared;
+using System;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -6,9 +7,16 @@ namespace Castling.Server
 {
     public class DefaultGameLogic : IGameLogic
     {
-        public GameData GameData { get; private set; }
+        public GameData GameData
+        {
+            get; private set;
+        }
 
-        private TeamColor currentPlayer;
+        public event Action OnGameStarted;
+        public event Action<ulong> OnGameEnded;
+        public event Action OnTurnChanged;
+        public event Action OnMoveFailed;
+        public event Action OnMoveSucceeded;
 
         // 생성자: 기본 체스판 초기화
         public DefaultGameLogic(ulong blackClientID, ulong whiteClientID)
@@ -17,10 +25,32 @@ namespace Castling.Server
             {
                 BlackClientID = blackClientID,
                 WhiteClientID = whiteClientID,
-                Board = InitializeBoard()
+                CurrentClientID = blackClientID,
             };
+        }
 
-            currentPlayer = TeamColor.White;
+        public void Init()
+        {
+            Debug.Log("GameLogic Init");
+            GameData.Board = InitializeBoard();
+            OnGameStarted?.Invoke();
+        }
+
+        public void Clear()
+        {
+            // 보드 및 기물 데이터 초기화
+            GameData.Board.Tiles = null;
+            GameData.Board.Pieces.Clear();
+            GameData = null;
+
+            // 이벤트 핸들러 해제
+            OnGameStarted = null;
+            OnGameEnded = null;
+            OnTurnChanged = null;
+            OnMoveFailed = null;
+            OnMoveSucceeded = null;
+
+            Debug.Log("GameData and events cleared.");
         }
 
         // 체스판 초기화 메서드
@@ -31,8 +61,8 @@ namespace Castling.Server
             {
                 xSize = boardSize,
                 ySize = boardSize,
-                tiles = new Tile[boardSize, boardSize],
-                pieces = new List<Piece>()
+                Tiles = new Tile[boardSize, boardSize],
+                Pieces = new List<Piece>()
             };
 
             // 보드 타일 초기화
@@ -40,7 +70,7 @@ namespace Castling.Server
             {
                 for (int j = 0; j < boardSize; j++)
                 {
-                    board.tiles[i, j] = new Tile
+                    board.Tiles[i, j] = new Tile
                     {
                         Position = new Vector2Int(i, j),
                         Piece = null  // 초기에는 모든 타일에 말이 없음
@@ -60,39 +90,41 @@ namespace Castling.Server
         {
             // 폰 (2열, 7열)
             for (int i = 0; i < 8; i++)
-    {
-        PlacePiece(board, TeamColor.Black, PieceType.Pawn, i, 1, $"black_pawn_{i}");
-        PlacePiece(board, TeamColor.White, PieceType.Pawn, i, 6, $"white_pawn_{i}");
+            {
+                PlacePiece(board, TeamColor.Black, PieceType.Pawn, i, 1, $"black_pawn_{i}");
+                PlacePiece(board, TeamColor.White, PieceType.Pawn, i, 6, $"white_pawn_{i}");
 
-        PlacePiece(board, TeamColor.Black, majorPieces[i], i, 0, $"black_{majorPieces[i].ToString().ToLower()}_{i}");
-        PlacePiece(board, TeamColor.White, majorPieces[i], i, 7, $"white_{majorPieces[i].ToString().ToLower()}_{i}");
-    }
+                PlacePiece(board, TeamColor.Black, majorPieces[i], i, 0, $"black_{majorPieces[i].ToString().ToLower()}_{i}");
+                PlacePiece(board, TeamColor.White, majorPieces[i], i, 7, $"white_{majorPieces[i].ToString().ToLower()}_{i}");
+            }
         }
 
         // 말 배치 메서드
         private void PlacePiece(Board board, TeamColor color, PieceType type, int x, int y, string uid)
         {
-            Piece piece = new Piece { Color = color, Type = type, UID = uid, Position = new Vector2Int(x, y) };
-            board.pieces.Add(piece);
-            board.tiles[x, y].Piece = piece;
+            Piece piece = new Piece { Logic = this, Color = color, Type = type, UID = uid, Position = new Vector2Int(x, y) };
+            board.Pieces.Add(piece);
+            board.Tiles[x, y].Piece = piece;
         }
 
-        public bool TryMovePiece(string pieceUID, int destinationX, int destinationY)
+        public void TryMovePiece(string pieceUID, int destinationX, int destinationY)
         {
             // pieceUID를 통해 해당 piece를 찾는다.
-            Piece pieceToMove = GameData.Board.pieces.Find(piece => piece.UID == pieceUID);
+            Piece pieceToMove = GameData.Board.Pieces.Find(piece => piece.UID == pieceUID);
 
             if (pieceToMove == null)
             {
                 Debug.LogError($"No piece found with UID: {pieceUID}");
-                return false; // 기물이 존재하지 않으면 false 반환
+                OnMoveFailed?.Invoke();
+                return;
             }
 
             // 해당 piece가 움직일 수 있는 턴인지 확인
-            if (pieceToMove.Color != currentPlayer)
+            if (pieceToMove.Color != GetTeamColor(GameData.CurrentClientID))
             {
                 Debug.LogError("It's not this player's turn!");
-                return false; // 다른 플레이어의 기물을 움직이려 하면 false 반환
+                OnMoveFailed?.Invoke();
+                return;
             }
 
             // 현재 위치와 목표 위치 설정
@@ -103,19 +135,20 @@ namespace Castling.Server
             if (!MovePiece(from, to))
             {
                 Debug.LogError("Move failed!");
-                return false; // 이동할 수 없는 위치일 경우 false 반환
+                OnMoveFailed?.Invoke();
+                return;
             }
 
+            OnMoveSucceeded?.Invoke();
             // 턴 교체
             ChangeTurn();
-            return true; // 성공적으로 이동하면 true 반환
         }
 
         // 기물 이동 메서드
         private bool MovePiece(Vector2Int from, Vector2Int to)
         {
-            Tile fromTile = GameData.Board.tiles[from.x, from.y];
-            Tile toTile = GameData.Board.tiles[to.x, to.y];
+            Tile fromTile = GameData.Board.Tiles[from.x, from.y];
+            Tile toTile = GameData.Board.Tiles[to.x, to.y];
 
             // 기물이 있는지 확인
             if (fromTile.Piece == null)
@@ -152,8 +185,22 @@ namespace Castling.Server
         // 턴 교체 메서드
         private void ChangeTurn()
         {
-            currentPlayer = currentPlayer == TeamColor.White ? TeamColor.Black : TeamColor.White;
-            Debug.Log($"It's now {currentPlayer}'s turn.");
+            GameData.CurrentClientID = GameData.CurrentClientID == GameData.BlackClientID ? GameData.WhiteClientID : GameData.BlackClientID;
+            Debug.Log($"It's now {GetTeamColor(GameData.CurrentClientID)}'s turn.");
+
+            OnTurnChanged?.Invoke();
+        }
+
+        private TeamColor GetTeamColor(ulong clientID)
+        {
+            if (clientID == GameData.BlackClientID)
+            {
+                return TeamColor.Black;
+            }
+            else // if (clientID == GameData.WhiteClientID)
+            {
+                return TeamColor.White;
+            }
         }
     }
 }

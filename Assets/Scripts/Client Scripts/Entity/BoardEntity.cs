@@ -50,7 +50,7 @@ public class BoardEntity : MonoBehaviour
         testData.Board.xSize = xSize;
         testData.Board.ySize = ySize;
 
-        testData.Board.tiles = new Tile[xSize, ySize];
+        testData.Board.Tiles = new Tile[xSize, ySize];
         for (int i = 0; i < xSize; i++)
         {
             for (int j = 0; j < ySize; j++)
@@ -58,11 +58,11 @@ public class BoardEntity : MonoBehaviour
                 Tile tile = new Tile();
                 tile.Position = tiles[i, j].Position;
 
-                testData.Board.tiles[i, j] = tile;
+                testData.Board.Tiles[i, j] = tile;
             }
         }
 
-        testData.Board.pieces = new List<Piece>();
+        testData.Board.Pieces = new List<Piece>();
         foreach (PieceEntity pieceEntity in pieces.Values)
         {
             Piece piece = new Piece();
@@ -80,11 +80,11 @@ public class BoardEntity : MonoBehaviour
                 
             }
 
-            testData.Board.pieces.Add(piece);
+            testData.Board.Pieces.Add(piece);
         }
 
         Piece pie = null;
-        foreach (Piece p in testData.Board.pieces)
+        foreach (Piece p in testData.Board.Pieces)
         {
             if (p.UID != actorID)
             {
@@ -93,9 +93,9 @@ public class BoardEntity : MonoBehaviour
             }
         }
 
-        if (pie != null) testData.Board.pieces.Remove(pie);
+        if (pie != null) testData.Board.Pieces.Remove(pie);
 
-        MovePieceResult(testData.Board.pieces.ToDictionary(x => x.UID, x => x));
+        MovePieceResult(testData.Board.Pieces.ToDictionary(x => x.UID, x => x));
     }
 
 
@@ -124,7 +124,7 @@ public class BoardEntity : MonoBehaviour
 
     private void CreatePieces(GameData gameData)
     {
-        foreach (var piece in gameData.Board.pieces)
+        foreach (var piece in gameData.Board.Pieces)
         {
             string name = piece.Type.ToString();
             string UID = piece.UID;
