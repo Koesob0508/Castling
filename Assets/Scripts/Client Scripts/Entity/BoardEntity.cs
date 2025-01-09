@@ -138,7 +138,7 @@ public class BoardEntity : MonoBehaviour
 
     private void CreatePiece(string prefabName, string UID, PieceType pieceID, TeamColor color, Vector2Int position)
     {
-        string pieceName = $"Piece_{prefabName}_{color}";
+        string pieceName = $"{color} {prefabName}";
         PieceEntity piecePrefab = Resources.Load<PieceEntity>($"Prefabs/{pieceName}");
 
         if (piecePrefab == null)

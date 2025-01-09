@@ -80,7 +80,6 @@ public class PieceEntity : MonoBehaviour
         transform.localPosition = new Vector3(0, 1, 0);
     }
 
-
     public void Die()
     {
         isDie = true;
