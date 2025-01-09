@@ -3,26 +3,29 @@ using UnityEngine;
 
 public class TileEntity : MonoBehaviour
 {
-    private int x;
-    private int y;
+    private Vector2Int position = new Vector2Int();
+    [SerializeField]
     private GameObject MoveableEffect;
-
-    public int X { get => x; private set => x = value; }
-    public int Y { get => y; private set => y = value; }
+    private bool isMoveable = false;
+    public Vector2Int Position { get => position; set => position = value; }
+    public bool IsMoveable => isMoveable;
 
     public void Init(int x, int y)
     {
-        this.x = x;
-        this.y = y;
+        position.x = x;
+        position.y = y;
+        MoveableEffect.SetActive(false);
     }
 
     public void ShowMoveableEffect()
     {
         MoveableEffect.SetActive(true);
+        isMoveable = true;
     }
 
     public void HideMoveableEffect()
     {
         MoveableEffect.SetActive(false);
+        isMoveable= false;
     }
 }

@@ -1,5 +1,9 @@
+using NUnit.Framework;
+using System.Collections.Generic;
+using System.Linq;
 using System.Security.Cryptography;
 using Unity.Netcode;
+using UnityEditor.Experimental.GraphView;
 using UnityEngine;
 using UnityEngine.Rendering;
 
@@ -9,9 +13,16 @@ public class Player : MonoBehaviour
     private eColor color;
 
     [SerializeField]
-    private PieceEntity capturedPiece;
+    private BoardEntity board;
+    [SerializeField]
+    private PieceEntity? capturedPiece;
     [SerializeField]
     private GameObject cursor;
+
+    private void Start()
+    {
+        board = Managers.Instance.Board;
+    }
 
     public void Init(ulong clientID, eColor color)
     {
@@ -43,10 +54,28 @@ public class Player : MonoBehaviour
                     else
                         UnCapturePiece();
                 }
+                else if (hit.collider.TryGetComponent(out TileEntity tile))
+                {
+
+                    if (tile.IsMoveable)
+                    {
+                        var targetPosition = capturedPiece.GetMoveablePositions()
+                            .Find(pos => pos == tile.Position);
+
+                        if (targetPosition != null)
+                        {
+                            capturedPiece.Move(targetPosition);
+                            UnCapturePiece();
+                        }
+                    }
+                }
                 else
                 {
                     UnCapturePiece();
                 }
+
+
+
             }
             else
             {
@@ -69,6 +98,9 @@ public class Player : MonoBehaviour
         cursorPosition.y += 1.5f;
         cursor.transform.position = cursorPosition;
         cursor.SetActive(true);
+
+        List<Vector2Int> moveablePositions = capturedPiece.GetMoveablePositions();
+        board.ShowMoveableTiles(moveablePositions);
     }
 
     private void UnCapturePiece()
@@ -77,5 +109,6 @@ public class Player : MonoBehaviour
 
         cursor.SetActive(false);
         capturedPiece = null;
+        board.HideMoveableTiles();
     }
 }

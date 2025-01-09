@@ -1,6 +1,8 @@
+using Castling.Shared;
 using System;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UIElements;
 
 public class BoardEntity : MonoBehaviour
 {
@@ -16,9 +18,12 @@ public class BoardEntity : MonoBehaviour
     [SerializeField]
     private List<PieceEntity> pieces;
 
-    public void Start()
+    public TileEntity GetTile(Vector2Int position) => tiles[position.x, position.y];
+
+    public void Awake()
     {
         tiles = new TileEntity[xSize, ySize];
+        Managers.Instance.Board = this;
         CreateBoard();
         CreatePieces();
     }
@@ -35,13 +40,14 @@ public class BoardEntity : MonoBehaviour
         {
             for (int y = 0; y < ySize; y++)
             {
-                TileEntity tile;
+                TileEntity tilePrefab;
 
                 if ((x + y) % 2 == 0)
-                    tile = Instantiate(TileBlack, transform);
+                    tilePrefab = Resources.Load<TileEntity>($"Prefabs/Tile_Black");
                 else
-                    tile = Instantiate(TileWhite, transform);
+                    tilePrefab = Resources.Load<TileEntity>($"Prefabs/Tile_White");
 
+                TileEntity tile = Instantiate(tilePrefab, transform);
                 tile.Init(x, y);
                 tile.name = $"Tile ({x},{y})";
                 tile.transform.position = new Vector3(x, 0, y);
@@ -53,26 +59,26 @@ public class BoardEntity : MonoBehaviour
 
     private void CreatePieces()
     {
-        CreatePiece("Pawn", Guid.NewGuid().ToString(), 0, eColor.White, 1, 0);
-        CreatePiece("Pawn", Guid.NewGuid().ToString(), 0, eColor.White, 1, 1);
-        CreatePiece("Pawn", Guid.NewGuid().ToString(), 0, eColor.White, 1, 2);
-        CreatePiece("Pawn", Guid.NewGuid().ToString(), 0, eColor.White, 1, 3);
-        CreatePiece("Pawn", Guid.NewGuid().ToString(), 0, eColor.White, 1, 4);
-        CreatePiece("Pawn", Guid.NewGuid().ToString(), 0, eColor.White, 1, 5);
-        CreatePiece("Pawn", Guid.NewGuid().ToString(), 0, eColor.White, 1, 6);
-        CreatePiece("Pawn", Guid.NewGuid().ToString(), 0, eColor.White, 1, 7);
-
-        CreatePiece("Pawn", Guid.NewGuid().ToString(), 0, eColor.Black, 6, 0);
-        CreatePiece("Pawn", Guid.NewGuid().ToString(), 0, eColor.Black, 6, 1);
-        CreatePiece("Pawn", Guid.NewGuid().ToString(), 0, eColor.Black, 6, 2);
-        CreatePiece("Pawn", Guid.NewGuid().ToString(), 0, eColor.Black, 6, 3);
-        CreatePiece("Pawn", Guid.NewGuid().ToString(), 0, eColor.Black, 6, 4);
-        CreatePiece("Pawn", Guid.NewGuid().ToString(), 0, eColor.Black, 6, 5);
-        CreatePiece("Pawn", Guid.NewGuid().ToString(), 0, eColor.Black, 6, 6);
-        CreatePiece("Pawn", Guid.NewGuid().ToString(), 0, eColor.Black, 6, 7);
+        CreatePiece("Pawn", Guid.NewGuid().ToString(), PieceType.Pawn, eColor.White, new Vector2Int(1, 0));
+        CreatePiece("Pawn", Guid.NewGuid().ToString(), PieceType.Pawn, eColor.White, new Vector2Int(1, 1));
+        CreatePiece("Pawn", Guid.NewGuid().ToString(), PieceType.Pawn, eColor.White, new Vector2Int(1, 2));
+        CreatePiece("Pawn", Guid.NewGuid().ToString(), PieceType.Pawn, eColor.White, new Vector2Int(1, 3));
+        CreatePiece("Pawn", Guid.NewGuid().ToString(), PieceType.Pawn, eColor.White, new Vector2Int(1, 4));
+        CreatePiece("Pawn", Guid.NewGuid().ToString(), PieceType.Pawn, eColor.White, new Vector2Int(1, 5));
+        CreatePiece("Pawn", Guid.NewGuid().ToString(), PieceType.Pawn, eColor.White, new Vector2Int(1, 6));
+        CreatePiece("Pawn", Guid.NewGuid().ToString(), PieceType.Pawn, eColor.White, new Vector2Int(1, 7));
+                                                       
+        CreatePiece("Pawn", Guid.NewGuid().ToString(), PieceType.Pawn, eColor.Black, new Vector2Int(6, 0));
+        CreatePiece("Pawn", Guid.NewGuid().ToString(), PieceType.Pawn, eColor.Black, new Vector2Int(6, 1));
+        CreatePiece("Pawn", Guid.NewGuid().ToString(), PieceType.Pawn, eColor.Black, new Vector2Int(6, 2));
+        CreatePiece("Pawn", Guid.NewGuid().ToString(), PieceType.Pawn, eColor.Black, new Vector2Int(6, 3));
+        CreatePiece("Pawn", Guid.NewGuid().ToString(), PieceType.Pawn, eColor.Black, new Vector2Int(6, 4));
+        CreatePiece("Pawn", Guid.NewGuid().ToString(), PieceType.Pawn, eColor.Black, new Vector2Int(6, 5));
+        CreatePiece("Pawn", Guid.NewGuid().ToString(), PieceType.Pawn, eColor.Black, new Vector2Int(6, 6));
+        CreatePiece("Pawn", Guid.NewGuid().ToString(), PieceType.Pawn, eColor.Black, new Vector2Int(6, 7));
     }
 
-    private void CreatePiece(string prefabName, string UID, int pieceID, eColor color, int x, int y)
+    private void CreatePiece(string prefabName, string UID, PieceType pieceID, eColor color, Vector2Int position)
     {
         string pieceName = $"Piece_{prefabName}_{color}";
         PieceEntity piecePrefab = Resources.Load<PieceEntity>($"Prefabs/{pieceName}");
@@ -84,15 +90,9 @@ public class BoardEntity : MonoBehaviour
         }
 
         PieceEntity piece = Instantiate(piecePrefab);
-        piece.UID = UID;
-        piece.Color = color;
-        piece.transform.parent = tiles[x, y].transform;
+        piece.Init(UID, pieceID, color, position);
+        piece.transform.parent = tiles[position.x, position.y].transform;
         piece.transform.localPosition = new Vector3(0, 1, 0);
-    }
-
-    private void MovePiece(string UID, int toX, int toY)
-    {
-
     }
 
     public void ShowMoveableTiles(List<Vector2Int> positions)
@@ -113,5 +113,4 @@ public class BoardEntity : MonoBehaviour
             }
         }
     }
-
 }
