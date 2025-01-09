@@ -19,6 +19,8 @@ public class Managers : MonoBehaviour
 
     private BoardEntity board;
 
+    public ServerManager Server;
+    public ClientManager Client;
 
     public static Managers Instance => instance;
 
@@ -31,10 +33,11 @@ public class Managers : MonoBehaviour
 
     private void Start()
     {
-        InputJoinCode.onValueChanged.AddListener((value) =>
-        {
-            InputJoinCode.text = RelayManager.CleanJoinCode(value);
-        });
+        Server = new ServerManager();
+        Client = new ClientManager();
+
+        Server.Init();
+        Client.Init();
     }
 
     public void StartServer()

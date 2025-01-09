@@ -35,6 +35,7 @@ namespace Castling.Shared
             }
 
             serializer.SerializeValue(ref UID);
+            serializer.SerializeValue(ref Position);
         }
 
         public virtual List<Tile> GetMoveableTiles(int currentX, int currentY) { return null; }
@@ -59,6 +60,8 @@ namespace Castling.Shared
 
                 Piece?.NetworkSerialize(serializer);
             }
+
+            serializer.SerializeValue(ref Position);
         }
     }
 
@@ -71,7 +74,62 @@ namespace Castling.Shared
 
         public void NetworkSerialize<T>(BufferSerializer<T> serializer) where T : IReaderWriter
         {
-            throw new NotImplementedException();
+            // 1. Board 크기 직렬화
+            serializer.SerializeValue(ref xSize);
+            serializer.SerializeValue(ref ySize);
+
+            // 2. Tile 배열 직렬화
+            if (serializer.IsWriter)
+            {
+                // Writer일 경우, 배열 직렬화
+                for (int i = 0; i < xSize; i++)
+                {
+                    for (int j = 0; j < ySize; j++)
+                    {
+                        Tile tile = tiles[i, j];
+                        serializer.SerializeValue(ref tile);
+                    }
+                }
+            }
+            else
+            {
+                // Reader일 경우, 배열 초기화 후 역직렬화
+                tiles = new Tile[xSize, ySize];
+                for (int i = 0; i < xSize; i++)
+                {
+                    for (int j = 0; j < ySize; j++)
+                    {
+                        Tile tile = new Tile();  // 새 Tile 인스턴스 생성
+                        serializer.SerializeValue(ref tile);
+                        tiles[i, j] = tile;
+                    }
+                }
+            }
+
+            // 3. Piece 리스트 직렬화
+            int piecesCount = pieces?.Count ?? 0;
+            serializer.SerializeValue(ref piecesCount);
+
+            if (serializer.IsWriter)
+            {
+                // Writer일 경우, 리스트 직렬화
+                foreach (Piece piece in pieces)
+                {
+                    Piece tempPiece = piece;
+                    serializer.SerializeValue(ref tempPiece);
+                }
+            }
+            else
+            {
+                // Reader일 경우, 리스트 초기화 후 역직렬화
+                pieces = new List<Piece>(piecesCount);
+                for (int i = 0; i < piecesCount; i++)
+                {
+                    Piece piece = new Piece();  // 새 Piece 인스턴스 생성
+                    serializer.SerializeValue(ref piece);
+                    pieces.Add(piece);
+                }
+            }
         }
     }
 
