@@ -53,35 +53,20 @@ namespace Castling.Server
 
             return board;
         }
+        private readonly PieceType[] majorPieces = { PieceType.Rook, PieceType.Knight, PieceType.Bishop, PieceType.Queen, PieceType.King, PieceType.Bishop, PieceType.Knight, PieceType.Rook };
 
         // 기본 말 배치
         private void InitializePieces(Board board)
         {
             // 폰 (2열, 7열)
             for (int i = 0; i < 8; i++)
-            {
-                board.pieces.Add(new Piece { Color = TeamColor.Black, Type = PieceType.Pawn, UID = $"black_pawn_{i}", Position = new Vector2Int(i, 1) });
-                board.pieces.Add(new Piece { Color = TeamColor.White, Type = PieceType.Pawn, UID = $"white_pawn_{i}", Position = new Vector2Int(i, 6) });
-            }
+    {
+        PlacePiece(board, TeamColor.Black, PieceType.Pawn, i, 1, $"black_pawn_{i}");
+        PlacePiece(board, TeamColor.White, PieceType.Pawn, i, 6, $"white_pawn_{i}");
 
-            // 주요 기물 (양 끝줄)
-            PlacePiece(board, TeamColor.Black, PieceType.Rook, 0, 0, "black_rook_0");
-            PlacePiece(board, TeamColor.Black, PieceType.Rook, 7, 0, "black_rook_1");
-            PlacePiece(board, TeamColor.Black, PieceType.Knight, 1, 0, "black_knight_0");
-            PlacePiece(board, TeamColor.Black, PieceType.Knight, 6, 0, "black_knight_1");
-            PlacePiece(board, TeamColor.Black, PieceType.Bishop, 2, 0, "black_bishop_0");
-            PlacePiece(board, TeamColor.Black, PieceType.Bishop, 5, 0, "black_bishop_1");
-            PlacePiece(board, TeamColor.Black, PieceType.Queen, 3, 0, "black_queen");
-            PlacePiece(board, TeamColor.Black, PieceType.King, 4, 0, "black_king");
-
-            PlacePiece(board, TeamColor.White, PieceType.Rook, 0, 7, "white_rook_0");
-            PlacePiece(board, TeamColor.White, PieceType.Rook, 7, 7, "white_rook_1");
-            PlacePiece(board, TeamColor.White, PieceType.Knight, 1, 7, "white_knight_0");
-            PlacePiece(board, TeamColor.White, PieceType.Knight, 6, 7, "white_knight_1");
-            PlacePiece(board, TeamColor.White, PieceType.Bishop, 2, 7, "white_bishop_0");
-            PlacePiece(board, TeamColor.White, PieceType.Bishop, 5, 7, "white_bishop_1");
-            PlacePiece(board, TeamColor.White, PieceType.Queen, 3, 7, "white_queen");
-            PlacePiece(board, TeamColor.White, PieceType.King, 4, 7, "white_king");
+        PlacePiece(board, TeamColor.Black, majorPieces[i], i, 0, $"black_{majorPieces[i].ToString().ToLower()}_{i}");
+        PlacePiece(board, TeamColor.White, majorPieces[i], i, 7, $"white_{majorPieces[i].ToString().ToLower()}_{i}");
+    }
         }
 
         // 말 배치 메서드
