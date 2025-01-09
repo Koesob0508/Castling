@@ -20,7 +20,6 @@ public class Player : MonoBehaviour
     [SerializeField]
     private GameObject cursor;
 
-
     public void Init(ulong clientID, TeamColor color)
     {
         board = Managers.Instance.Board;
@@ -30,19 +29,19 @@ public class Player : MonoBehaviour
 
     private void Update()
     {
-        // ∏∂øÏΩ∫ ≈¨∏Ø ¿‘∑¬
+        // ÎßàÏö∞Ïä§ ÌÅ¥Î¶≠ ÏûÖÎ†•
         if (Input.GetMouseButtonDown(0))
         {
-            // ƒ´∏ﬁ∂Ûø°º≠ ∏∂øÏΩ∫ ∆˜¿Œ≈Õ πÊ«‚¿∏∑Œ ∑π¿Ã ª˝º∫
+            // Ïπ¥Î©îÎùºÏóêÏÑú ÎßàÏö∞Ïä§ Ìè¨Ïù∏ÌÑ∞ Î∞©Ìñ•ÏúºÎ°ú Î†àÏù¥ ÏÉùÏÑ±
             Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
 
-            // √Êµπ ¡§∫∏∏¶ ¿˙¿Â«“ RaycastHit ∫Øºˆ
+            // Ï∂©Îèå Ï†ïÎ≥¥Î•º Ï†ÄÏû•Ìï† RaycastHit Î≥ÄÏàò
             RaycastHit hit;
 
-            // Raycast Ω««‡
+            // Raycast Ïã§Ìñâ
             if (Physics.Raycast(ray, out hit))
             {
-                // √Êµπ«— ø¿∫Í¡ß∆Æ ¡§∫∏ √‚∑¬
+                // Ï∂©ÎèåÌïú Ïò§Î∏åÏ†ùÌä∏ Ï†ïÎ≥¥ Ï∂úÎ†•
                 Debug.Log($"Hit Object: {hit.collider.gameObject.name}");
 
                 if (hit.collider.TryGetComponent(out PieceEntity piece))
@@ -54,33 +53,27 @@ public class Player : MonoBehaviour
                 }
                 else if (hit.collider.TryGetComponent(out TileEntity tile))
                 {
-
                     if (tile.IsMoveable)
                     {
-                        var targetPosition = capturedPiece.GetMoveablePositions()
-                            .Find(pos => pos == tile.Position);
+                        var destinationTile = capturedPiece.GetMoveablePositions()
+                            .Find(moveableTile => moveableTile.Position == tile.Position);
 
-                        if (targetPosition != null)
+                        if (destinationTile != null)
                         {
-                            // ≈¨∂Û∏∏ ¿÷¿ª ∂ß
-                            //capturedPiece.Move(targetPosition);
-                            //UnCapturePiece();
+                            // ÏÑúÎ≤ÑÏóêÍ≤å Ï†ÑÏÜ°ÌïòÍ∏∞
+                            Managers.Instance.Client
+                                .SendTryMovePiece(capturedPiece.UID, destinationTile.Position);
 
-                            // º≠πˆø°∞‘ ¿¸º€«œ±‚
-                            //Managers.Instance.Client.SendTryMovePiece(capturedPiece.UID, targetPosition);
-
-                            // ≈◊Ω∫∆Æ ¡ﬂ
-                            board.BoardTestData(capturedPiece.UID, targetPosition);
+                            // ÌÖåÏä§Ìä∏ Ï§ë
+                            //board.BoardTestData(capturedPiece.UID, targetPosition);
                         }
                     }
-
                     UnCapturePiece();
                 }
                 else
                 {
                     UnCapturePiece();
                 }
-
             }
             else
             {
@@ -103,7 +96,7 @@ public class Player : MonoBehaviour
         cursor.transform.localPosition = new Vector3(0, 1.2f, 0);
         cursor.SetActive(true);
 
-        List<Vector2Int> moveablePositions = capturedPiece.GetMoveablePositions();
+        List<Tile> moveablePositions = capturedPiece.GetMoveablePositions();
         board.ShowMoveableTiles(moveablePositions);
     }
 

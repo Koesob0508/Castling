@@ -1,6 +1,7 @@
 using Castling.Shared;
 using NUnit.Framework;
 using System.Collections.Generic;
+using System.Linq;
 using Unity.Collections;
 using Unity.Netcode;
 using UnityEditor.VersionControl;
@@ -36,7 +37,7 @@ public class ClientManager
     private void OnOtherClientJoin(ulong clientID)
     {
         if(!network.IsHost)
-            Debug.Log("¹º°¡ Àß¸øµÊ");
+            Debug.Log("ë­”ê°€ ì˜ëª»ë¨");
     }
 
     private void OnReceivedServerMessage(ulong clientID, FastBufferReader reader)
@@ -47,15 +48,15 @@ public class ClientManager
         switch (commandType)
         {
             case CommandType.TryMovePiece:
-                // Client¿¡¼­´Â ½ÇÇàÇÏÁö ¾ÊÀ½.
+                // Clientì—ì„œëŠ” ì‹¤í–‰í•˜ì§€ ì•ŠìŒ.
                 break;
             case CommandType.StartGame:
                 reader.ReadValueSafe(out gameData);
                 StartGame(gameData);
-                // Server¿¡¼­´Â ½ÇÇàÇÏÁö ¾ÊÀ½
+                // Serverì—ì„œëŠ” ì‹¤í–‰í•˜ì§€ ì•ŠìŒ
                 break;
             case CommandType.EndGame:
-                // Server¿¡¼­´Â ½ÇÇàÇÏÁö ¾ÊÀ½
+                // Serverì—ì„œëŠ” ì‹¤í–‰í•˜ì§€ ì•ŠìŒ
                 break;
             case CommandType.MovePieceResult:
                 reader.ReadValueSafe(out bool result);
@@ -70,22 +71,27 @@ public class ClientManager
     }
     private void StartGame(GameData gameData)
     {
+        Managers.Instance.GameData = gameData;
         Managers.Instance.GameStart(gameData);
     }
 
     private void MovePieceResult(string uid, GameData gameData)
     {
+        Debug.Log("MovePieceResult");
 
+        Managers.Instance.GameData = gameData;
+        Managers.Instance.Board.MovePieceResult
+            (gameData.Board.Pieces.ToDictionary(x => x.UID, x => x));
     }
 
     public void SendTryMovePiece(string pieceUID, Vector2Int destination)
     {
         Debug.Log("SendTryMovePiece");
-        // ¾ÆÁ÷ ¹Ş´Â »ç¶÷ Á¤º¸°¡ ¾ø´Ù.
+        // ì•„ì§ ë°›ëŠ” ì‚¬ëŒ ì •ë³´ê°€ ì—†ë‹¤.
         ulong targetClientID = 0;
 
         FastBufferWriter writer = new FastBufferWriter(size: 128, allocator: Allocator.Temp);
-        // message ³»¿ëÀ» ½Æ´Â´Ù.
+        // message ë‚´ìš©ì„ ì‹£ëŠ”ë‹¤.
         writer.WriteValueSafe(CommandType.TryMovePiece);
         writer.WriteValueSafe(pieceUID);
         writer.WriteValueSafe(destination.x);
@@ -95,20 +101,20 @@ public class ClientManager
 
         if (NetworkManager.Singleton.IsHost)
         {
-            // ConnectedClientsIds¿¡ Á¢±ÙÇÒ ¼ö ÀÖ´Â °ÍÀº Host´Ï±î °¡´ÉÇÔ
-            // Client¿¡¼­´Â ¾ÈµÈ´Ù.
+            // ConnectedClientsIdsì— ì ‘ê·¼í•  ìˆ˜ ìˆëŠ” ê²ƒì€ Hostë‹ˆê¹Œ ê°€ëŠ¥í•¨
+            // Clientì—ì„œëŠ” ì•ˆëœë‹¤.
             List<ulong> clientIDs = new List<ulong>(NetworkManager.Singleton.ConnectedClientsIds);
             clientIDs.Remove(NetworkManager.Singleton.LocalClientId);
 
-            // ¸Ş½ÃÁö¸¦ º¸³¾ ¶§, List °ªÀ» ÁÖ¸é List¿¡ ÀÖ´Â ¸ğµç Client¿¡°Ô ¸Ş½Ã¸¦ º¸³½´Ù.
+            // ë©”ì‹œì§€ë¥¼ ë³´ë‚¼ ë•Œ, List ê°’ì„ ì£¼ë©´ Listì— ìˆëŠ” ëª¨ë“  Clientì—ê²Œ ë©”ì‹œë¥¼ ë³´ë‚¸ë‹¤.
             NetworkManager.Singleton.CustomMessagingManager.SendNamedMessage("FromClient", clientIDs, writer, networkDelivery);
         }
         else if (NetworkManager.Singleton.IsClient)
         {
-            // Client¿¡¼­´Â ServerClientId´Â ¾Ë ¼ö ÀÖ´Ù.
+            // Clientì—ì„œëŠ” ServerClientIdëŠ” ì•Œ ìˆ˜ ìˆë‹¤.
             targetClientID = NetworkManager.ServerClientId;
 
-            // Server¿¡°Ô ¸Ş½ÃÁö º¸³»±â
+            // Serverì—ê²Œ ë©”ì‹œì§€ ë³´ë‚´ê¸°
             NetworkManager.Singleton.CustomMessagingManager.SendNamedMessage("FromClient", targetClientID, writer, networkDelivery);
         }
         else

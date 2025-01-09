@@ -12,12 +12,13 @@ public class PieceEntity : MonoBehaviour
     private bool isMoving = false;
     private BoardEntity board;
     private string uid = string.Empty;
-    private PieceType pieceID = 0;
+    private PieceType pieceType = 0;
     private TeamColor color;
     private Vector2Int position;
+    private Piece pieceModel;
 
     public string UID { get => uid; private set => uid = value; }
-    public PieceType PieceID { get => pieceID; private set => pieceID = value; }
+    public PieceType PieceID { get => pieceType; private set => pieceType = value; }
     public TeamColor Color { get => color; private set => color = value; }
     public Vector2Int Position { get => position; private set => position = value; }
 
@@ -26,36 +27,47 @@ public class PieceEntity : MonoBehaviour
         board = Managers.Instance.Board;
     }
 
-    public void Init(string UID, PieceType pieceID, TeamColor color, Vector2Int position)
+    public void Init(string UID, PieceType pieceType, TeamColor color, Vector2Int position)
     {
         isDie = false;
         this.UID = UID;
+        this.pieceType = pieceType;
         this.color = color;
         this.position = position;
+
+        switch (pieceType)
+        {
+            case PieceType.None:
+            case PieceType.Pawn:
+            default:
+                pieceModel = new Pawn();
+                break;
+            case PieceType.King:
+                pieceModel = new King();
+                break;
+            case PieceType.Queen:
+                pieceModel = new Queen();
+                break;
+            case PieceType.Bishop:
+                pieceModel = new Bishop();
+                break;
+            case PieceType.Knight:
+                pieceModel = new Knight();
+                break;
+            case PieceType.Rook:
+                pieceModel = new Rook();
+                break;
+        }
     }
 
 
-    public virtual List<Vector2Int> GetMoveablePositions()
+    public virtual List<Tile> GetMoveablePositions()
     {
-        List<Vector2Int> moveablePositions = new List<Vector2Int>();
-        
-        if (color == TeamColor.Black)
-        {
-            moveablePositions.Add(new Vector2Int(Position.x - 1, Position.y));
-            moveablePositions.Add(new Vector2Int(Position.x - 2, Position.y));
-        }
-        else
-        {
-            moveablePositions.Add(new Vector2Int(Position.x + 1, Position.y));
-            moveablePositions.Add(new Vector2Int(Position.x + 2, Position.y));
-        }
-
-        return moveablePositions;
+        return pieceModel.GetMoveableTiles(Managers.Instance.GameData, position.x, position.y);
     }
 
     public void Move(Vector2Int destination)
     {
-
         StartCoroutine(MoveToPosition(destination, 0.5f));
     }
 
@@ -71,8 +83,8 @@ public class PieceEntity : MonoBehaviour
         while (elapsedTime < duration)
         {
             transform.position = Vector3.Lerp(startPosition, endPosition, elapsedTime / duration);
-            elapsedTime += Time.deltaTime; // ÇÁ·¹ÀÓ ½Ã°£À» ´©Àû
-            yield return null; // ´ÙÀ½ ÇÁ·¹ÀÓ±îÁö ´ë±â
+            elapsedTime += Time.deltaTime; // í”„ë ˆìž„ ì‹œê°„ì„ ëˆ„ì 
+            yield return null; // ë‹¤ìŒ í”„ë ˆìž„ê¹Œì§€ ëŒ€ê¸°
         }
 
         isMoving = false;

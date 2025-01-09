@@ -26,6 +26,8 @@ public class Managers : MonoBehaviour
 
     public static Managers Instance => instance;
 
+    public GameData GameData;
+
     public BoardEntity Board { get => board; private set => board = value; }
     public Player Player { get => player; private set => player = value; }
 
@@ -46,7 +48,7 @@ public class Managers : MonoBehaviour
     public void StartServer()
     {
         // NetworkManager.Singleton.StartServer();
-        Debug.Log("Server·Î´Â µ¿ÀÛÇÏÁö ¾Ê½À´Ï´Ù. Host·Î ½ÇÇàÇØÁÖ¼¼¿ä.");
+        Debug.Log("Serverë¡œëŠ” ë™ì‘í•˜ì§€ ì•ŠìŠµë‹ˆë‹¤. Hostë¡œ ì‹¤í–‰í•´ì£¼ì„¸ìš”.");
     }
 
     public void StartClient()
@@ -61,7 +63,7 @@ public class Managers : MonoBehaviour
         //    Debug.LogError("Join Code is empty or invalid after cleaning.");
         //    return;
         //}
-        Debug.Log("ÀÌÁ¦ºÎÅÍ ÀÌ ÄÄÇ»ÅÍ´Â ClientÀÔ´Ï´Ù.");
+        Debug.Log("ì´ì œë¶€í„° ì´ ì»´í“¨í„°ëŠ” Clientì…ë‹ˆë‹¤.");
     }
 
     public void StartHost()
@@ -70,7 +72,7 @@ public class Managers : MonoBehaviour
         //NetworkManager.Singleton.GetComponent<UnityTransport>().SetRelayServerData(data.IPv4Address, data.Port, data.AllocationIdBytes, data.Key, data.ConnectionData);
         NetworkManager.Singleton.StartHost();
         //ShowJoinCode.text = data.JoinCode;
-        Debug.Log("ÀÌÁ¦ºÎÅÍ ÀÌ ÄÄÇ»ÅÍ´Â HostÀÔ´Ï´Ù.");
+        Debug.Log("ì´ì œë¶€í„° ì´ ì»´í“¨í„°ëŠ” Hostì…ë‹ˆë‹¤.");
     }
 
 

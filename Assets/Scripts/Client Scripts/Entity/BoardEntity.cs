@@ -136,7 +136,7 @@ public class BoardEntity : MonoBehaviour
         }
     }
 
-    private void CreatePiece(string prefabName, string UID, PieceType pieceID, TeamColor color, Vector2Int position)
+    private void CreatePiece(string prefabName, string UID, PieceType pieceType, TeamColor color, Vector2Int position)
     {
         string pieceName = $"{color} {prefabName}";
         PieceEntity piecePrefab = Resources.Load<PieceEntity>($"Prefabs/{pieceName}");
@@ -148,17 +148,17 @@ public class BoardEntity : MonoBehaviour
         }
 
         PieceEntity piece = Instantiate(piecePrefab);
-        piece.Init(UID, pieceID, color, position);
+        piece.Init(UID, pieceType, color, position);
         piece.transform.parent = tiles[position.x, position.y].transform;
         piece.transform.localPosition = new Vector3(0, 1, 0);
         pieces.Add(UID, piece);
     }
 
-    public void ShowMoveableTiles(List<Vector2Int> positions)
+    public void ShowMoveableTiles(List<Tile> positions)
     {
-        foreach (Vector2Int position in positions)
+        foreach (Tile tile in positions)
         {
-            tiles[position.x, position.y].ShowMoveableEffect();
+            tiles[tile.Position.x, tile.Position.y].ShowMoveableEffect();
         }
     }
 
