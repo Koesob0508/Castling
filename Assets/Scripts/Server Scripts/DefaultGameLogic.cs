@@ -53,7 +53,6 @@ namespace Castling.Server
             Debug.Log("GameData and events cleared.");
         }
 
-        // 체스판 초기화 메서드
         private Board InitializeBoard()
         {
             int boardSize = 8;
@@ -196,6 +195,15 @@ namespace Castling.Server
             toTile.Piece = pieceToMove;
             fromTile.Piece = null;
             pieceToMove.Position = to;
+
+            //if (pieceToMove is King)
+            //{
+            //    (pieceToMove as King).SetHasMoved(true);
+            //}
+            //else if (pieceToMove is Rook)
+            //{
+            //    (pieceToMove as Rook).SetHasMoved(true);
+            //}
 
             Debug.Log($"Moved {pieceToMove.Type} to {to}");
             return true;
