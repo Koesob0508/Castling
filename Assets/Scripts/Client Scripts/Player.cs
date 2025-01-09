@@ -64,8 +64,12 @@ public class Player : MonoBehaviour
 
                         if (targetPosition != null)
                         {
-                            capturedPiece.Move(targetPosition);
-                            UnCapturePiece();
+                            // 클라만 있을 때
+                            //capturedPiece.Move(targetPosition);
+                            //UnCapturePiece();
+
+                            // 서버에게 전송하기
+                            ClientManager.Instance.SendTryMovePiece(capturedPiece.UID, targetPosition);
                         }
                     }
                 }
@@ -73,8 +77,6 @@ public class Player : MonoBehaviour
                 {
                     UnCapturePiece();
                 }
-
-
 
             }
             else

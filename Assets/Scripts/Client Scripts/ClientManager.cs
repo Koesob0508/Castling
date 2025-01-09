@@ -1,16 +1,24 @@
 using Castling.Shared;
 using NUnit.Framework;
-using System.Diagnostics;
+using System.Collections.Generic;
+using Unity.Collections;
 using Unity.Netcode;
+using UnityEditor.VersionControl;
 using UnityEngine;
 
 public class ClientManager
 {
     private NetworkManager network;
+    private static ClientManager clientManager;
+    public static ClientManager Instance;
+
     public void Init()
     {
         network = NetworkManager.Singleton;
         network.CustomMessagingManager.RegisterNamedMessageHandler("FromServer", OnReceivedServerMessage);
+        
+        if (Instance == null)
+            clientManager = this;
     }
 
     private void OnReceivedServerMessage(ulong clientID, FastBufferReader reader)
@@ -21,6 +29,7 @@ public class ClientManager
         switch (commandType)
         {
             case CommandType.TryMovePiece:
+                // Client에서는 실행하지 않음.
                 break;
             case CommandType.StartGame:
                 reader.ReadValueSafe(out gameData);
@@ -68,4 +77,42 @@ public class ClientManager
 
     }
 
+    public void SendTryMovePiece(string pieceUID, Vector2Int destination)
+    {
+        Debug.Log("SendTryMovePiece");
+        // 아직 받는 사람 정보가 없다.
+        ulong targetClientID = 0;
+
+        FastBufferWriter writer = new FastBufferWriter(size: 128, allocator: Allocator.Temp);
+        // message 내용을 싣는다.
+        writer.WriteValueSafe(CommandType.TryMovePiece);
+        writer.WriteValueSafe(pieceUID);
+        writer.WriteValueSafe(destination.x);
+        writer.WriteValueSafe(destination.y);
+
+        NetworkDelivery networkDelivery = NetworkDelivery.ReliableSequenced;
+
+        if (NetworkManager.Singleton.IsHost)
+        {
+            // ConnectedClientsIds에 접근할 수 있는 것은 Host니까 가능함
+            // Client에서는 안된다.
+            List<ulong> clientIDs = new List<ulong>(NetworkManager.Singleton.ConnectedClientsIds);
+            clientIDs.Remove(NetworkManager.Singleton.LocalClientId);
+
+            // 메시지를 보낼 때, List 값을 주면 List에 있는 모든 Client에게 메시를 보낸다.
+            NetworkManager.Singleton.CustomMessagingManager.SendNamedMessage("FromClient", clientIDs, writer, networkDelivery);
+        }
+        else if (NetworkManager.Singleton.IsClient)
+        {
+            // Client에서는 ServerClientId는 알 수 있다.
+            targetClientID = NetworkManager.ServerClientId;
+
+            // Server에게 메시지 보내기
+            NetworkManager.Singleton.CustomMessagingManager.SendNamedMessage("FromClient", targetClientID, writer, networkDelivery);
+        }
+        else
+        {
+            return;
+        }
+    }
 }
