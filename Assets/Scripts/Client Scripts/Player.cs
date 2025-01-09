@@ -20,13 +20,10 @@ public class Player : MonoBehaviour
     [SerializeField]
     private GameObject cursor;
 
-    private void Start()
-    {
-        board = Managers.Instance.Board;
-    }
 
     public void Init(ulong clientID, TeamColor color)
     {
+        board = Managers.Instance.Board;
         this.clientID = clientID;
         this.color = color;
     }
