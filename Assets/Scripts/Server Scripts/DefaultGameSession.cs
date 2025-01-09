@@ -1,4 +1,4 @@
-﻿using Castling.Shared;
+using Castling.Shared;
 using System.Collections.Generic;
 using Unity.Netcode;
 using UnityEngine;
@@ -19,15 +19,15 @@ namespace Castling.Server
             Players = playerInfos;
 
             Logic = new DefaultGameLogic(Players[0].ClientID, Players[1].ClientID);
-            Logic.Init();
-
-            NetworkManager.Singleton.CustomMessagingManager.RegisterNamedMessageHandler("FromClient", OnReceivedClientMessage);
-
             Logic.OnGameStarted += SendGameStarted;
             Logic.OnGameEnded += SendGameEnded;
             Logic.OnTurnChanged += SendTurnChanged;
             Logic.OnMoveSucceeded += () => SendMovePieceResult(true);
             Logic.OnMoveFailed += () => SendMovePieceResult(false);
+
+            NetworkManager.Singleton.CustomMessagingManager.RegisterNamedMessageHandler("FromClient", OnReceivedClientMessage);
+            
+            Logic.Init();
         }
 
         public void Clear()

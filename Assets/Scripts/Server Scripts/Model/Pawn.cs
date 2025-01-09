@@ -9,7 +9,7 @@ public class Pawn : Piece
         List<Tile> moveableTiles = new List<Tile>();
 
         // 현재 폰의 방향: 화이트는 위로(감소), 블랙은 아래로(증가)
-        int direction = this.Color == TeamColor.White ? -1 : 1;
+        int direction = Color == TeamColor.White ? -1 : 1;
 
         // 전진 1칸 이동
         Vector2Int forwardOne = new Vector2Int(currentX, currentY + direction);
@@ -19,7 +19,7 @@ public class Pawn : Piece
         }
 
         // 첫 이동 시 전진 2칸 이동
-        int startingY = this.Color == TeamColor.White ? 6 : 1;
+        int startingY = Color == TeamColor.White ? 6 : 1;
         if (currentY == startingY && IsTileEmpty(forwardOne))
         {
             Vector2Int forwardTwo = new Vector2Int(currentX, currentY + 2 * direction);
@@ -60,6 +60,6 @@ public class Pawn : Piece
             return false;
 
         Tile tile = Logic.GameData.Board.Tiles[pos.x, pos.y];
-        return tile?.Piece != null && tile.Piece.Color != this.Color;
+        return tile?.Piece != null && tile.Piece.Color != Color;
     }
 }
