@@ -60,6 +60,8 @@ public class ClientManager
                 break;
             case CommandType.MovePieceResult:
                 reader.ReadValueSafe(out bool result);
+                Debug.Log("movepieceresult");
+                Debug.Log(result);
                 if (result)
                 {
                     reader.ReadValueSafe(out string uid);
@@ -104,7 +106,6 @@ public class ClientManager
             // ConnectedClientsIds에 접근할 수 있는 것은 Host니까 가능함
             // Client에서는 안된다.
             List<ulong> clientIDs = new List<ulong>(NetworkManager.Singleton.ConnectedClientsIds);
-            clientIDs.Remove(NetworkManager.Singleton.LocalClientId);
 
             // 메시지를 보낼 때, List 값을 주면 List에 있는 모든 Client에게 메시를 보낸다.
             NetworkManager.Singleton.CustomMessagingManager.SendNamedMessage("FromClient", clientIDs, writer, networkDelivery);
