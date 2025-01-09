@@ -586,7 +586,8 @@ MonoBehaviour:
   CameraWhite: {fileID: 961739752}
   CameraBlack: {fileID: 1418998203}
   InitUI: {fileID: 545467046}
-  message: {fileID: 55733627}
+  ShowJoinCode: {fileID: 735553056}
+  InputJoinCode: {fileID: 183502852}
 --- !u!4 &266714490
 Transform:
   m_ObjectHideFlags: 0
@@ -1211,8 +1212,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   TileBlack: {fileID: -260983931781128911, guid: fccf381dcbe1a2846aa06bc09bee2d26, type: 3}
   TileWhite: {fileID: 5034419771296007368, guid: c3699ec3d9e25d142bfef578ab086b7d, type: 3}
-  boardXSize: 8
-  boardYSize: 8
+  xSize: 8
+  ySize: 8
   pieces: []
 --- !u!1 &961739749
 GameObject:
@@ -2354,6 +2355,7 @@ MonoBehaviour:
     NetworkTopology: 0
     UseCMBService: 0
     AutoSpawnPlayerPrefabClientSide: 1
+    NetworkMessageMetrics: 1
     NetworkProfilingMetrics: 1
     OldPrefabList: []
   RunInBackground: 1
@@ -2538,6 +2540,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: cc330cc1a9ef0b649a275874da6de2c0, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  capturedPiece: {fileID: 0}
   cursor: {fileID: 1231072189}
 --- !u!4 &1926146410
 Transform:

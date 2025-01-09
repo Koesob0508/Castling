@@ -14,7 +14,8 @@ public class Managers : MonoBehaviour
 
     public GameObject InitUI;
 
-    public TMP_Text message;
+    public TMP_Text ShowJoinCode;
+    public TMP_InputField InputJoinCode;
 
     private int boardXSize;
     private int boardYSize;
@@ -32,30 +33,43 @@ public class Managers : MonoBehaviour
         instance = this;
     }
 
+    private void Start()
+    {
+        InputJoinCode.onValueChanged.AddListener((value) =>
+        {
+            InputJoinCode.text = RelayManager.CleanJoinCode(value);
+        });
+    }
+
     public void StartServer()
     {
         // NetworkManager.Singleton.StartServer();
         Debug.Log("Server로는 동작하지 않습니다. Host로 실행해주세요.");
     }
 
-    public async void StartClient()
+    public void StartClient()
     {
-        var data = await RelayManager.JoinRelay(message.text, "production");
-        NetworkManager.Singleton.GetComponent<UnityTransport>().SetRelayServerData(data.IPv4Address, data.Port, data.AllocationIdBytes, data.Key, data.ConnectionData);
-
-
+        //var data = await RelayManager.JoinRelay(InputJoinCode.text, "production");
+        //NetworkManager.Singleton.GetComponent<UnityTransport>().SetRelayServerData(data.IPv4Address, data.Port, data.AllocationIdBytes, data.Key, data.ConnectionData);
         NetworkManager.Singleton.StartClient();
+
+        //string cleanedJoinCode = RelayManager.CleanJoinCode(InputJoinCode.text);
+        //if (string.IsNullOrWhiteSpace(cleanedJoinCode))
+        //{
+        //    Debug.LogError("Join Code is empty or invalid after cleaning.");
+        //    return;
+        //}
         Debug.Log("이제부터 이 컴퓨터는 Client입니다.");
         Register();
     }
 
-    public async void StartHost()
+    public void StartHost()
     {
-        var data = await RelayManager.SetupRelay(10, "production");
-        NetworkManager.Singleton.GetComponent<UnityTransport>().SetRelayServerData(data.IPv4Address, data.Port, data.AllocationIdBytes, data.Key, data.ConnectionData);
-        Debug.Log($"Join Code : {data.JoinCode}");
-
+        //var data = await RelayManager.SetupRelay(10, "production");
+        //NetworkManager.Singleton.GetComponent<UnityTransport>().SetRelayServerData(data.IPv4Address, data.Port, data.AllocationIdBytes, data.Key, data.ConnectionData);
         NetworkManager.Singleton.StartHost();
+        //ShowJoinCode.text = data.JoinCode;
+
         Debug.Log("이제부터 이 컴퓨터는 Host입니다.");
         Register();
     }
@@ -81,7 +95,7 @@ public class Managers : MonoBehaviour
 
         FastBufferWriter writer = new FastBufferWriter(size: 128, allocator: Allocator.Temp);
         // message 내용을 싣는다.
-        writer.WriteValueSafe(message.text);
+        writer.WriteValueSafe(InputJoinCode.text);
         NetworkDelivery networkDelivery = NetworkDelivery.ReliableSequenced;
 
         if (NetworkManager.Singleton.IsHost)
