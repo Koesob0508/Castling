@@ -15,7 +15,7 @@ public class Player : MonoBehaviour
     [SerializeField]
     private BoardEntity board;
     [SerializeField]
-    private PieceEntity capturedPiece;
+    private PieceEntity? capturedPiece;
     [SerializeField]
     private GameObject cursor;
 
@@ -54,26 +54,28 @@ public class Player : MonoBehaviour
                     else
                         UnCapturePiece();
                 }
+                else if (hit.collider.TryGetComponent(out TileEntity tile))
+                {
+
+                    if (tile.IsMoveable)
+                    {
+                        var targetPosition = capturedPiece.GetMoveablePositions()
+                            .Find(pos => pos == tile.Position);
+
+                        if (targetPosition != null)
+                        {
+                            capturedPiece.Move(targetPosition);
+                            UnCapturePiece();
+                        }
+                    }
+                }
                 else
                 {
                     UnCapturePiece();
                 }
 
-                //if (hit.collider.TryGetComponent(out TileEntity tile))
-                //{
-                //    if (capturedPiece.Color == this.color)
-                //    {
-                //        var targetPosition = capturedPiece.GetMoveablePositions()
-                //            .Find(pos => pos == tile.Position);
 
-                //        if (targetPosition != null)
-                //        {
-                //            piece.Move(targetPosition);
-                //            UnCapturePiece();
-                //        }
-                //    }
-                //}
-                
+
             }
             else
             {
