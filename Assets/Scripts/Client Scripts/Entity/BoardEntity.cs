@@ -7,8 +7,8 @@ public class BoardEntity : MonoBehaviour
     public TileEntity TileBlack;
     public TileEntity TileWhite;
 
-    public int boardXSize = 8;
-    public int boardYSize = 8;
+    public int xSize = 8;
+    public int ySize = 8;
 
     [SerializeField]
 
@@ -18,7 +18,7 @@ public class BoardEntity : MonoBehaviour
 
     public void Start()
     {
-        tiles = new TileEntity[boardXSize, boardYSize];
+        tiles = new TileEntity[xSize, ySize];
         CreateBoard();
         CreatePieces();
     }
@@ -31,9 +31,9 @@ public class BoardEntity : MonoBehaviour
 
     private void CreateBoard()
     {
-        for (int x = 0; x < boardXSize; x++)
+        for (int x = 0; x < xSize; x++)
         {
-            for (int y = 0; y < boardYSize; y++)
+            for (int y = 0; y < ySize; y++)
             {
                 TileEntity tile;
 
@@ -45,7 +45,7 @@ public class BoardEntity : MonoBehaviour
                 tile.Init(x, y);
                 tile.name = $"Tile ({x},{y})";
                 tile.transform.position = new Vector3(x, 0, y);
-                
+
                 tiles[x, y] = tile;
             }
         }
@@ -93,6 +93,25 @@ public class BoardEntity : MonoBehaviour
     private void MovePiece(string UID, int toX, int toY)
     {
 
+    }
+
+    public void ShowMoveableTiles(List<Vector2Int> positions)
+    {
+        foreach (Vector2Int position in positions)
+        {
+            tiles[position.x, position.y].ShowMoveableEffect();
+        }
+    }
+
+    public void HideMoveableTiles()
+    {
+        for (int x = 0; x < xSize; x++)
+        {
+            for (int y = 0; y < ySize; y++)
+            {
+                tiles[x, y].HideMoveableEffect();
+            }
+        }
     }
 
 }

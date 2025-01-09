@@ -5,6 +5,7 @@ public class TileEntity : MonoBehaviour
 {
     private int x;
     private int y;
+    private GameObject MoveableEffect;
 
     public int X { get => x; private set => x = value; }
     public int Y { get => y; private set => y = value; }
@@ -15,5 +16,13 @@ public class TileEntity : MonoBehaviour
         this.y = y;
     }
 
+    public void ShowMoveableEffect()
+    {
+        MoveableEffect.SetActive(true);
+    }
 
+    public void HideMoveableEffect()
+    {
+        MoveableEffect.SetActive(false);
+    }
 }

@@ -585,6 +585,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   CameraWhite: {fileID: 961739752}
   CameraBlack: {fileID: 1418998203}
+  InitUI: {fileID: 545467046}
   message: {fileID: 55733627}
 --- !u!4 &266714490
 Transform:

@@ -8,6 +8,7 @@ public class Player : MonoBehaviour
     private ulong clientID;
     private eColor color;
 
+    [SerializeField]
     private PieceEntity capturedPiece;
     [SerializeField]
     private GameObject cursor;
@@ -62,6 +63,7 @@ public class Player : MonoBehaviour
     private void CapturePiece(PieceEntity piece)
     {
         if (capturedPiece) UnCapturePiece();
+        capturedPiece = piece;
 
         Vector3 cursorPosition = piece.transform.position;
         cursorPosition.y += 1.5f;

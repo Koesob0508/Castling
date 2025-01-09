@@ -34,10 +34,14 @@ namespace Castling.Shared
 
             serializer.SerializeValue(ref UID);
         }
+
+        public virtual List<Tile> GetMoveableTiles(int currentX, int currentY) { return null; }
     }
 
     public class Tile : INetworkSerializable
     {
+        public int xPosition;
+        public int yPosition;
         public Piece? Piece;
 
         public void NetworkSerialize<T>(BufferSerializer<T> serializer) where T : IReaderWriter
@@ -54,6 +58,18 @@ namespace Castling.Shared
 
                 Piece?.NetworkSerialize(serializer);
             }
+        }
+    }
+
+    public class Board : INetworkSerializable
+    {
+        public int xSize;
+        public int ySize;
+
+
+        public void NetworkSerialize<T>(BufferSerializer<T> serializer) where T : IReaderWriter
+        {
+            throw new NotImplementedException();
         }
     }
 
@@ -74,7 +90,7 @@ namespace Castling.Shared
             serializer.SerializeValue(ref outerCount);
 
             // 2. 직렬화 중일 때는 Board 초기화 필요 (Deserialize 과정)
-            if (!serializer.IsWriter)
+            if (serializer.IsReader)
             {
                 Board = new List<List<Tile>>(outerCount);
             }

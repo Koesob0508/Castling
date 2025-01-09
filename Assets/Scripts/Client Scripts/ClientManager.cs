@@ -1,4 +1,5 @@
 using Castling.Shared;
+using NUnit.Framework;
 using System.Diagnostics;
 using Unity.Netcode;
 using UnityEngine;
@@ -15,13 +16,14 @@ public class ClientManager
     private void OnReceivedServerMessage(ulong clientID, FastBufferReader reader)
     {
         reader.ReadValueSafe(out ushort commandType);
+        GameData gameData;
 
         switch (commandType)
         {
             case CommandType.TryMovePiece:
                 break;
             case CommandType.StartGame:
-                reader.ReadValueSafe(out GameData gameData);
+                reader.ReadValueSafe(out gameData);
                 StartGame(gameData);
                 // Server에서는 실행하지 않음
                 break;
@@ -33,9 +35,8 @@ public class ClientManager
                 if (result)
                 {
                     reader.ReadValueSafe(out string uid);
-                    reader.ReadValueSafe(out int x);
-                    reader.ReadValueSafe(out int y);
-                    MovePieceResult(uid, x, y);
+                    reader.ReadValueSafe(out gameData);
+                    MovePieceResult(uid, gameData);
                 }
                 break;
         }
@@ -61,12 +62,8 @@ public class ClientManager
         }
 
     }
-    private void ClickPieceResult(string uid, int x, int y)
-    {
 
-    }
-
-    private void MovePieceResult(string uid, int x, int y)
+    private void MovePieceResult(string uid, GameData gameData)
     {
 
     }
