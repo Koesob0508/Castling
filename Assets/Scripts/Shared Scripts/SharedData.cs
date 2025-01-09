@@ -20,7 +20,7 @@ namespace Castling.Shared
     {
         public PieceType Type = PieceType.None;
         public string UID;
-        public Tile Tile;
+        public Vector2Int Position;
 
         public void NetworkSerialize<T>(BufferSerializer<T> serializer) where T : IReaderWriter
         {
