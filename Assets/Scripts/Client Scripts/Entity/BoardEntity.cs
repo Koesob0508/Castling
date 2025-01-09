@@ -26,7 +26,7 @@ public class BoardEntity : MonoBehaviour
 
     private void Start()
     {
-        Managers.Instance.Board = this;
+        
     }
 
     public void Init(GameData gameData)
@@ -143,7 +143,7 @@ public class BoardEntity : MonoBehaviour
 
         if (piecePrefab == null)
         {
-            Debug.LogError($"{prefabName} does not exist.");
+            Debug.LogError($"{pieceName} does not exist.");
             return;
         }
 
