@@ -4,6 +4,8 @@ namespace Castling.Server
 {
     public interface IGameSession
     {
-        public void Init(List<PlayerInfo> playerInfos);
+        int SessionID { get; }
+        void Init(int sessionID, List<PlayerInfo> playerInfos);
+        void Clear();
     }
 }

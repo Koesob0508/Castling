@@ -7,22 +7,27 @@ namespace Castling.Server
 {
     public class DefaultGameSession : IGameSession
     {
+        public int SessionID { get; private set; }
         private List<PlayerInfo> Players;
-        private GameData GameData;
+        private IGameLogic Logic;
 
-        public void Init(List<PlayerInfo> playerInfos)
+        public void Init(int sessionID, List<PlayerInfo> playerInfos)
         {
             Debug.Log("Game session initilaize");
 
+            SessionID = sessionID;
             Players = playerInfos;
 
-            GameData = new();
-            GameData.BlackClientID = Players[0].ClientID;
-            GameData.WhiteClientID = Players[0].ClientID;
+            Logic = new DefaultGameLogic(Players[0].ClientID, Players[1].ClientID);
 
             NetworkManager.Singleton.CustomMessagingManager.RegisterNamedMessageHandler("FromClient", OnReceivedClientMessage);
 
             SendStartGame();
+        }
+
+        public void Clear()
+        {
+            NetworkManager.Singleton.CustomMessagingManager.UnregisterNamedMessageHandler("FromClient");
         }
 
         private void OnReceivedClientMessage(ulong clientID, FastBufferReader reader)
@@ -36,15 +41,6 @@ namespace Castling.Server
                     reader.ReadValueSafe(out int destinationX);
                     reader.ReadValueSafe(out int destinationY);
                     TryMovePiece(uid, destinationX, destinationY);
-                    break;
-                case CommandType.StartGame:
-                    // Server에서는 실행하지 않음
-                    break;
-                case CommandType.EndGame:
-                    // Server에서는 실행하지 않음
-                    break;
-                case CommandType.MovePieceResult:
-                    // Server에서는 실행하지 않음
                     break;
             }
         }
@@ -60,12 +56,18 @@ namespace Castling.Server
         {
             Debug.Log("Start Game");
 
-            FastBufferWriter writer = new FastBufferWriter(size: 128, allocator: Unity.Collections.Allocator.Temp);
+            using (FastBufferWriter writer = new FastBufferWriter(size: 128, allocator: Unity.Collections.Allocator.Temp))
+            {
+                writer.WriteValueSafe(CommandType.StartGame);
+                writer.WriteValueSafe(Logic.GameData);
 
-            writer.WriteValueSafe(CommandType.StartGame);
-            writer.WriteValueSafe(GameData);
+                SendToAll(writer);
+            }
+        }
 
-            foreach (var player in Players)
+        private void SendToAll(FastBufferWriter writer)
+        {
+            foreach(var player in Players)
             {
                 NetworkManager.Singleton.CustomMessagingManager.SendNamedMessage("FromServer", player.ClientID, writer, NetworkDelivery.ReliableSequenced);
             }

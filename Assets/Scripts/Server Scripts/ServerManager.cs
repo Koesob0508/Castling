@@ -8,7 +8,7 @@ public class ServerManager
 {
     private Queue<ulong> ReadyPlayers;
     private Dictionary<ulong, PlayerInfo> PlayingPlayers;
-    private List<IGameSession> Sessions;
+    private Dictionary<int, IGameSession> Sessions;
 
     public void Init()
     {
@@ -24,11 +24,9 @@ public class ServerManager
         NetworkManager.Singleton.OnClientConnectedCallback -= OnConnect;
     }
 
-    
-
     private void OnConnect(ulong clientID)
     {
-        if(clientID == NetworkManager.Singleton.LocalClientId)
+        if (clientID == NetworkManager.Singleton.LocalClientId)
         {
             OnMyClientJoin();
         }
@@ -40,7 +38,7 @@ public class ServerManager
 
     private void OnMyClientJoin()
     {
-        if(!NetworkManager.Singleton.IsHost)
+        if (!NetworkManager.Singleton.IsHost)
         {
             Clear();
             return;
@@ -83,13 +81,21 @@ public class ServerManager
 
     private void OpenSession(List<PlayerInfo> playerInfos)
     {
+        var sessionID = Sessions.Count;
         var gameSession = new DefaultGameSession();
-        Sessions.Add(gameSession);
-        gameSession.Init(playerInfos);
-
+        gameSession.Init(sessionID, playerInfos);
+        Sessions[sessionID] = gameSession;
     }
 
-    
+    private void CloseSession(int sessionID)
+    {
+        if (Sessions.TryGetValue(sessionID, out var session))
+        {
+            session.Clear();
+            Sessions.Remove(sessionID);
+        }
+
+    }
 }
 
 public class PlayerInfo
