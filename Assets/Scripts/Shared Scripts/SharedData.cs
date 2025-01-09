@@ -26,12 +26,15 @@ namespace Castling.Shared
         public void NetworkSerialize<T>(BufferSerializer<T> serializer) where T : IReaderWriter
         {
             // `PieceType` enum을 `int`로 직렬화
+            int colorValue = (int)Color;
+            serializer.SerializeValue(ref colorValue);
             int enumValue = (int)Type;
             serializer.SerializeValue(ref enumValue);
 
             // 역직렬화 시 `enum`으로 변환
             if (!serializer.IsWriter)
             {
+                Color = (eColor)colorValue;
                 Type = (PieceType)enumValue;
             }
 

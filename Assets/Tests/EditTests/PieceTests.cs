@@ -15,6 +15,7 @@ namespace Castling.Tests
             // 1. 원본 Piece 객체 생성
             Piece originalPiece = new Piece
             {
+                Color = eColor.White,
                 Type = PieceType.King,
                 UID = "piece_123",
                 Position = new Vector2Int(3, 5)
@@ -32,6 +33,7 @@ namespace Castling.Tests
                     reader.ReadNetworkSerializable(out deserializedPiece);
 
                     // 4. 검증
+                    Assert.AreEqual(originalPiece.Color, deserializedPiece.Color, "PieceColor mismatch");
                     Assert.AreEqual(originalPiece.Type, deserializedPiece.Type, "PieceType mismatch");
                     Assert.AreEqual(originalPiece.UID, deserializedPiece.UID, "UID mismatch");
                     Assert.AreEqual(originalPiece.Position, deserializedPiece.Position, "Position mismatch");
