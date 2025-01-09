@@ -141,50 +141,24 @@ namespace Castling.Shared
 
         public void NetworkSerialize<T>(BufferSerializer<T> serializer) where T : IReaderWriter
         {
-        //    // 0. BlackClientID와 WhiteClientID 직렬화
-        //    serializer.SerializeValue(ref BlackClientID);
-        //    serializer.SerializeValue(ref WhiteClientID);
+            // 1. Client IDs 직렬화
+            serializer.SerializeValue(ref BlackClientID);
+            serializer.SerializeValue(ref WhiteClientID);
 
-        //    // 1. 리스트의 외부 크기(행 수) 직렬화
-        //    int outerCount = Board.Count;
-        //    serializer.SerializeValue(ref outerCount);
+            // 2. Board 직렬화 여부 확인 (null일 수 있음)
+            bool hasBoard = Board != null;
+            serializer.SerializeValue(ref hasBoard);
 
-        //    // 2. 직렬화 중일 때는 Board 초기화 필요 (Deserialize 과정)
-        //    if (serializer.IsReader)
-        //    {
-        //        Board = new List<List<Tile>>(outerCount);
-        //    }
+            if (hasBoard)
+            {
+                if (!serializer.IsWriter && Board == null)
+                {
+                    Board = new Board();  // 역직렬화 시 Board가 null이면 새로 생성
+                }
 
-        //    for (int i = 0; i < outerCount; i++)
-        //    {
-        //        // 3. 내부 리스트가 null 일 경우 초기화
-        //        if (serializer.IsReader && Board.Count <= i)
-        //        {
-        //            Board.Add(new List<Tile>());
-        //        }
-
-        //        // 4. 내부 리스트(열)의 크기 직렬화
-        //        int innerCount = serializer.IsWriter ? Board[i].Count : 0;
-        //        serializer.SerializeValue(ref innerCount);
-
-        //        // 5. 내부 리스트 요소 직렬화
-        //        if (serializer.IsReader)
-        //        {
-        //            Board[i] = new List<Tile>(innerCount);
-        //        }
-
-        //        for (int j = 0; j < innerCount; j++)
-        //        {
-        //            Tile value = serializer.IsWriter ? Board[i][j] : new Tile();
-        //            serializer.SerializeValue(ref value);
-
-        //            if (serializer.IsReader)
-        //            {
-        //                Board[i].Add(value);
-        //            }
-        //        }
-
-        //    }
+                // Board 직렬화/역직렬화
+                serializer.SerializeValue(ref Board);
+            }
         }
     }
 }
