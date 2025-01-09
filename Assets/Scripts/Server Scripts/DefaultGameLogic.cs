@@ -8,6 +8,8 @@ namespace Castling.Server
     {
         public GameData GameData { get; private set; }
 
+        private TeamColor currentPlayer;
+
         // 생성자: 기본 체스판 초기화
         public DefaultGameLogic(ulong blackClientID, ulong whiteClientID)
         {
@@ -17,6 +19,8 @@ namespace Castling.Server
                 WhiteClientID = whiteClientID,
                 Board = InitializeBoard()
             };
+
+            currentPlayer = TeamColor.White;
         }
 
         // 체스판 초기화 메서드
@@ -56,8 +60,8 @@ namespace Castling.Server
             // 폰 (2열, 7열)
             for (int i = 0; i < 8; i++)
             {
-                board.pieces.Add(new Piece { Type = PieceType.Pawn, UID = $"black_pawn_{i}", Position = new Vector2Int(i, 1) });
-                board.pieces.Add(new Piece { Type = PieceType.Pawn, UID = $"white_pawn_{i}", Position = new Vector2Int(i, 6) });
+                board.pieces.Add(new Piece { Color = TeamColor.Black, Type = PieceType.Pawn, UID = $"black_pawn_{i}", Position = new Vector2Int(i, 1) });
+                board.pieces.Add(new Piece { Color = TeamColor.White, Type = PieceType.Pawn, UID = $"white_pawn_{i}", Position = new Vector2Int(i, 6) });
             }
 
             // 주요 기물 (양 끝줄)
@@ -88,8 +92,42 @@ namespace Castling.Server
             board.tiles[x, y].Piece = piece;
         }
 
+        public bool TryMovePiece(string pieceUID, int destinationX, int destinationY)
+        {
+            // pieceUID를 통해 해당 piece를 찾는다.
+            Piece pieceToMove = GameData.Board.pieces.Find(piece => piece.UID == pieceUID);
+
+            if (pieceToMove == null)
+            {
+                Debug.LogError($"No piece found with UID: {pieceUID}");
+                return false; // 기물이 존재하지 않으면 false 반환
+            }
+
+            // 해당 piece가 움직일 수 있는 턴인지 확인
+            if (pieceToMove.Color != currentPlayer)
+            {
+                Debug.LogError("It's not this player's turn!");
+                return false; // 다른 플레이어의 기물을 움직이려 하면 false 반환
+            }
+
+            // 현재 위치와 목표 위치 설정
+            Vector2Int from = pieceToMove.Position;
+            Vector2Int to = new Vector2Int(destinationX, destinationY);
+
+            // MovePiece 호출하여 이동 시도
+            if (!MovePiece(from, to))
+            {
+                Debug.LogError("Move failed!");
+                return false; // 이동할 수 없는 위치일 경우 false 반환
+            }
+
+            // 턴 교체
+            ChangeTurn();
+            return true; // 성공적으로 이동하면 true 반환
+        }
+
         // 기물 이동 메서드
-        public bool MovePiece(Vector2Int from, Vector2Int to)
+        private bool MovePiece(Vector2Int from, Vector2Int to)
         {
             Tile fromTile = GameData.Board.tiles[from.x, from.y];
             Tile toTile = GameData.Board.tiles[to.x, to.y];
@@ -124,6 +162,13 @@ namespace Castling.Server
         {
             List<Vector2Int> validMoves = piece.GetMoveableTiles(from.x, from.y).ConvertAll(tile => tile.Position);
             return validMoves.Contains(to);
+        }
+
+        // 턴 교체 메서드
+        private void ChangeTurn()
+        {
+            currentPlayer = currentPlayer == TeamColor.White ? TeamColor.Black : TeamColor.White;
+            Debug.Log($"It's now {currentPlayer}'s turn.");
         }
     }
 }
