@@ -18,6 +18,7 @@ namespace Castling.Shared
 
     public class Piece : INetworkSerializable
     {
+        public eColor Color;
         public PieceType Type = PieceType.None;
         public string UID;
         public Vector2Int Position;
