@@ -4,7 +4,7 @@ using UnityEngine;
 
 public class Pawn : Piece
 {
-    public override List<Tile> GetMoveableTiles(int currentX, int currentY)
+    public override List<Tile> GetMoveableTiles(GameData gameData, int currentX, int currentY)
     {
         List<Tile> moveableTiles = new List<Tile>();
 
@@ -13,17 +13,17 @@ public class Pawn : Piece
 
         // 전진 1칸 이동
         Vector2Int forwardOne = new Vector2Int(currentX, currentY + direction);
-        if (IsTileEmpty(forwardOne))
+        if (IsTileEmpty(gameData, forwardOne))
         {
             moveableTiles.Add(new Tile { Position = forwardOne });
         }
 
         // 첫 이동 시 전진 2칸 이동
         int startingY = Color == TeamColor.White ? 6 : 1;
-        if (currentY == startingY && IsTileEmpty(forwardOne))
+        if (currentY == startingY && IsTileEmpty(gameData, forwardOne))
         {
             Vector2Int forwardTwo = new Vector2Int(currentX, currentY + 2 * direction);
-            if (IsTileEmpty(forwardTwo))
+            if (IsTileEmpty(gameData, forwardTwo))
             {
                 moveableTiles.Add(new Tile { Position = forwardTwo });
             }
@@ -37,7 +37,7 @@ public class Pawn : Piece
 
         foreach (var attackPos in diagonalAttacks)
         {
-            if (IsOpponentPiece(attackPos))
+            if (IsOpponentPiece(gameData, attackPos))
             {
                 moveableTiles.Add(new Tile { Position = attackPos });
             }
@@ -47,19 +47,19 @@ public class Pawn : Piece
     }
 
     // 해당 타일이 비어 있는지 확인
-    private bool IsTileEmpty(Vector2Int pos)
+    private bool IsTileEmpty(GameData gameData, Vector2Int pos)
     {
-        Tile tile = Logic.GameData.Board.Tiles[pos.x, pos.y];
+        Tile tile = gameData.Board.Tiles[pos.x, pos.y];
         return tile != null && tile.Piece == null;
     }
 
     // 해당 위치에 상대방 기물이 있는지 확인
-    private bool IsOpponentPiece(Vector2Int pos)
+    private bool IsOpponentPiece(GameData gameData, Vector2Int pos)
     {
-        if (pos.x < 0 || pos.x >= Logic.GameData.Board.xSize || pos.y < 0 || pos.y >= Logic.GameData.Board.ySize)
+        if (pos.x < 0 || pos.x >= gameData.Board.xSize || pos.y < 0 || pos.y >= gameData.Board.ySize)
             return false;
 
-        Tile tile = Logic.GameData.Board.Tiles[pos.x, pos.y];
+        Tile tile = gameData.Board.Tiles[pos.x, pos.y];
         return tile?.Piece != null && tile.Piece.Color != Color;
     }
 }

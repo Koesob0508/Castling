@@ -1,0 +1,4 @@
+namespace Castling.Tests.PieceMove
+{
+
+}

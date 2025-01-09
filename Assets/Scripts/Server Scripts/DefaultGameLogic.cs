@@ -109,22 +109,22 @@ namespace Castling.Server
                     Debug.LogWarning("None type piece found.");
                     break;
                 case PieceType.King:
-                    piece = new King { Logic = this, Color = color, Type = type, UID = uid, Position = new Vector2Int(x, y) };
+                    piece = new King { Color = color, Type = type, UID = uid, Position = new Vector2Int(x, y) };
                     break;
                 case PieceType.Queen:
-                    piece = new Queen { Logic = this, Color = color, Type = type, UID = uid, Position = new Vector2Int(x, y) };
+                    piece = new Queen { Color = color, Type = type, UID = uid, Position = new Vector2Int(x, y) };
                     break;
                 case PieceType.Bishop:
-                    piece = new Bishop { Logic = this, Color = color, Type = type, UID = uid, Position = new Vector2Int(x, y) };
+                    piece = new Bishop { Color = color, Type = type, UID = uid, Position = new Vector2Int(x, y) };
                     break;
                 case PieceType.Knight:
-                    piece = new Knight { Logic = this, Color = color, Type = type, UID = uid, Position = new Vector2Int(x, y) };
+                    piece = new Knight { Color = color, Type = type, UID = uid, Position = new Vector2Int(x, y) };
                     break;
                 case PieceType.Rook:
-                    piece = new Rook { Logic = this, Color = color, Type = type, UID = uid, Position = new Vector2Int(x, y) };
+                    piece = new Rook { Color = color, Type = type, UID = uid, Position = new Vector2Int(x, y) };
                     break;
                 case PieceType.Pawn:
-                    piece = new Pawn { Logic = this, Color = color, Type = type, UID = uid, Position = new Vector2Int(x, y) };
+                    piece = new Pawn { Color = color, Type = type, UID = uid, Position = new Vector2Int(x, y) };
                     break;
             }
 
@@ -204,8 +204,7 @@ namespace Castling.Server
         // 이동 가능성 검사 메서드 (기초 구현)
         private bool IsMoveValid(Piece piece, Vector2Int from, Vector2Int to)
         {
-            if (piece is Pawn) Debug.Log("Null");
-            List<Vector2Int> validMoves = piece.GetMoveableTiles(from.x, from.y).ConvertAll(tile => tile.Position);
+            List<Vector2Int> validMoves = piece.GetMoveableTiles(GameData, from.x, from.y).ConvertAll(tile => tile.Position);
             return validMoves.Contains(to);
         }
 

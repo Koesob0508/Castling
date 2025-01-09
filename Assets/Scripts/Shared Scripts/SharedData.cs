@@ -25,7 +25,6 @@ namespace Castling.Shared
 
     public class Piece : INetworkSerializable
     {
-        public IGameLogic Logic;
         public TeamColor Color;
         public PieceType Type = PieceType.None;
         public string UID;
@@ -48,7 +47,7 @@ namespace Castling.Shared
             serializer.SerializeValue(ref Position);
         }
 
-        public virtual List<Tile> GetMoveableTiles(int currentX, int currentY) { return null; }
+        public virtual List<Tile> GetMoveableTiles(GameData gameData, int currentX, int currentY) { return null; }
     }
 
     public class Tile : INetworkSerializable

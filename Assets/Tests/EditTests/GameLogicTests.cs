@@ -1,6 +1,7 @@
 using Castling.Server;
 using Castling.Shared;
 using NUnit.Framework;
+using UnityEngine.TestTools;
 
 namespace Castling.Tests
 {
@@ -17,6 +18,12 @@ namespace Castling.Tests
 
             // `DefaultGameLogic` 초기화
             gameLogic = new DefaultGameLogic(blackClientID, whiteClientID);
+        }
+
+        [TearDown]
+        public void TearDown()
+        {
+            gameLogic = null;
         }
 
         [Test]
@@ -150,6 +157,8 @@ namespace Castling.Tests
             gameLogic.TryMovePiece(pieceUID, destinationX, destinationY);
 
             // Assert
+            LogAssert.Expect(UnityEngine.LogType.Error, "Invalid move!");
+            LogAssert.Expect(UnityEngine.LogType.Error, "Move failed!");
             Assert.IsTrue(moveFailed, "공격하지 않는 대각선 이동이 성공했습니다.");
             Piece originalPiece = gameData.Board.Tiles[startX, startY].Piece;
             Assert.IsNotNull(originalPiece, "원래 위치에 기물이 존재해야 합니다.");
@@ -177,6 +186,7 @@ namespace Castling.Tests
             gameLogic.TryMovePiece(pieceUID, destinationX, destinationY);
 
             // Assert
+            LogAssert.Expect(UnityEngine.LogType.Error, "It's not this player's turn!");
             Assert.IsTrue(moveFailed, "백의 턴에 흑 폰이 움직일 수 있으면 안 됩니다.");
         }
     }
