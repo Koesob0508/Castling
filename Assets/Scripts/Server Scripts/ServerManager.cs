@@ -40,17 +40,14 @@ public class ServerManager
 
     private void OnMyClientJoin()
     {
-        if (NetworkManager.Singleton.IsHost)
+        if(!NetworkManager.Singleton.IsHost)
         {
-            ReadyPlayers.Enqueue(NetworkManager.Singleton.LocalClientId);
-        }
-        else
-        {
-            Debug.Log("This is not host client");
-
             Clear();
             return;
         }
+
+        ReadyPlayers.Enqueue(NetworkManager.Singleton.LocalClientId);
+        WhenHasTwoConnectedClients();
     }
 
     private void OnOtherClientJoin(ulong clientID)
@@ -58,8 +55,12 @@ public class ServerManager
         if (ReadyPlayers.Contains(clientID)) return;
 
         ReadyPlayers.Enqueue(clientID);
+        WhenHasTwoConnectedClients();
+    }
 
-        if(ReadyPlayers.Count > 2)
+    private void WhenHasTwoConnectedClients()
+    {
+        if (ReadyPlayers.Count >= 2)
         {
             var player1 = ReadyPlayers.Dequeue();
             var player2 = ReadyPlayers.Dequeue();
@@ -73,6 +74,10 @@ public class ServerManager
 
             PlayingPlayers[player1] = player1Info;
             PlayingPlayers[player2] = player2Info;
+        }
+        else
+        {
+            Debug.Log($"Current connected clients: {ReadyPlayers.Count}");
         }
     }
 
