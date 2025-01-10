@@ -51,27 +51,27 @@ public class Managers : MonoBehaviour
         Debug.Log("Server로는 동작하지 않습니다. Host로 실행해주세요.");
     }
 
-    public void StartClient()
+    public async void StartClient()
     {
-        //var data = await RelayManager.JoinRelay(InputJoinCode.text, "production");
-        //NetworkManager.Singleton.GetComponent<UnityTransport>().SetRelayServerData(data.IPv4Address, data.Port, data.AllocationIdBytes, data.Key, data.ConnectionData);
+        var data = await RelayManager.JoinRelay(InputJoinCode.text, "production");
+        NetworkManager.Singleton.GetComponent<UnityTransport>().SetRelayServerData(data.IPv4Address, data.Port, data.AllocationIdBytes, data.Key, data.ConnectionData);
         NetworkManager.Singleton.StartClient();
 
-        //string cleanedJoinCode = RelayManager.CleanJoinCode(InputJoinCode.text);
-        //if (string.IsNullOrWhiteSpace(cleanedJoinCode))
-        //{
-        //    Debug.LogError("Join Code is empty or invalid after cleaning.");
-        //    return;
-        //}
+        string cleanedJoinCode = RelayManager.CleanJoinCode(InputJoinCode.text);
+        if (string.IsNullOrWhiteSpace(cleanedJoinCode))
+        {
+            Debug.LogError("Join Code is empty or invalid after cleaning.");
+            return;
+        }
         Debug.Log("이제부터 이 컴퓨터는 Client입니다.");
     }
 
-    public void StartHost()
+    public async void StartHost()
     {
-        //var data = await RelayManager.SetupRelay(10, "production");
-        //NetworkManager.Singleton.GetComponent<UnityTransport>().SetRelayServerData(data.IPv4Address, data.Port, data.AllocationIdBytes, data.Key, data.ConnectionData);
+        var data = await RelayManager.SetupRelay(10, "production");
+        NetworkManager.Singleton.GetComponent<UnityTransport>().SetRelayServerData(data.IPv4Address, data.Port, data.AllocationIdBytes, data.Key, data.ConnectionData);
         NetworkManager.Singleton.StartHost();
-        //ShowJoinCode.text = data.JoinCode;
+        ShowJoinCode.text = data.JoinCode;
         Debug.Log("이제부터 이 컴퓨터는 Host입니다.");
     }
 

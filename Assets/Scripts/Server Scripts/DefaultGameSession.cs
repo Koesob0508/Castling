@@ -74,6 +74,7 @@ namespace Castling.Server
 
         private void SendGameEnded(ulong winnerID)
         {
+            Debug.Log($"Winner : {winnerID} Player");
             using (FastBufferWriter writer = new FastBufferWriter(128, allocator: Unity.Collections.Allocator.Temp, 10240))
             {
                 writer.WriteValueSafe(CommandType.EndGame);
