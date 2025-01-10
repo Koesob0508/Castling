@@ -127,7 +127,7 @@ namespace Castling.Shared
                 Pieces = new List<Piece>(piecesCount);
                 for (int i = 0; i < piecesCount; i++)
                 {
-                    Piece piece = new Piece();  // �� Piece �ν��Ͻ� ����
+                    Piece piece = new Piece();
                     serializer.SerializeNetworkSerializable(ref piece);
                     Pieces.Add(piece);
                 }
