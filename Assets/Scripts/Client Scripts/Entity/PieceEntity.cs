@@ -27,13 +27,14 @@ public class PieceEntity : MonoBehaviour
         board = Managers.Instance.Board;
     }
 
-    public void Init(string UID, PieceType pieceType, TeamColor color, Vector2Int position)
+    public void Init(string UID, PieceType pieceType, TeamColor color, TileEntity tileEntity)
     {
         isDie = false;
         this.UID = UID;
         this.pieceType = pieceType;
         this.color = color;
-        this.position = position;
+        this.position = tileEntity.Position;
+        SetPositionAtTile(tileEntity);
 
         switch (pieceType)
         {
@@ -60,6 +61,11 @@ public class PieceEntity : MonoBehaviour
         }
     }
 
+    public void SetPositionAtTile(TileEntity tileEntity)
+    {
+        transform.parent = tileEntity.transform;
+        transform.localPosition = new Vector3(0, 0.5f, 0);
+    }
 
     public virtual List<Tile> GetMoveablePositions()
     {
@@ -68,6 +74,7 @@ public class PieceEntity : MonoBehaviour
 
     public void Move(Vector2Int destination)
     {
+        Debug.Log("Move : " + name + ", " + Position + ", " + destination);
         StartCoroutine(MoveToPosition(destination, 0.5f));
     }
 
@@ -77,7 +84,7 @@ public class PieceEntity : MonoBehaviour
         Position = destination;
 
         Vector3 startPosition = transform.position;
-        Vector3 endPosition = new Vector3(destination.x, 1f, destination.y);
+        Vector3 endPosition = new Vector3(destination.x, 0.5f, destination.y);
         float elapsedTime = 0f;
 
         while (elapsedTime < duration)
@@ -88,12 +95,12 @@ public class PieceEntity : MonoBehaviour
         }
 
         isMoving = false;
-        transform.parent = board.GetTile(destination).transform;
-        transform.localPosition = new Vector3(0, 1, 0);
+        SetPositionAtTile(board.GetTile(destination));
     }
 
     public void Die()
     {
+        Debug.Log("Die :" + name);
         isDie = true;
         position = new(10, 10);
         gameObject.SetActive(false);

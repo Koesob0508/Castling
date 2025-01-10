@@ -148,9 +148,9 @@ public class BoardEntity : MonoBehaviour
         }
 
         PieceEntity piece = Instantiate(piecePrefab);
-        piece.Init(UID, pieceType, color, position);
-        piece.transform.parent = tiles[position.x, position.y].transform;
-        piece.transform.localPosition = new Vector3(0, 1, 0);
+        TileEntity tileEntity = tiles[position.x, position.y];
+
+        piece.Init(UID, pieceType, color, tileEntity);
         pieces.Add(UID, piece);
     }
 
