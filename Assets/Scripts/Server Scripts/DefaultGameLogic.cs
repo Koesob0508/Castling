@@ -154,6 +154,7 @@ namespace Castling.Server
             // 현재 위치와 목표 위치 설정
             Vector2Int from = pieceToMove.Position;
             Vector2Int to = new Vector2Int(destinationX, destinationY);
+            Piece targetPiece = GameData.Board.Tiles[to.x, to.y].Piece;
 
             // MovePiece 호출하여 이동 시도
             if (!MovePiece(from, to))
@@ -164,6 +165,14 @@ namespace Castling.Server
             }
 
             OnMoveSucceeded?.Invoke();
+
+            // **King**을 잡은 경우 게임 종료
+            if (targetPiece is King)
+            {
+                Debug.Log("King captured! Game over.");
+                OnGameEnded?.Invoke(GameData.CurrentClientID);  // 현재 플레이어가 승리
+                return;
+            }
 
             // 턴 교체
             ChangeTurn();
@@ -192,6 +201,7 @@ namespace Castling.Server
             }
 
             // 이동 처리
+            if (toTile.Piece != null) Debug.Log($"{toTile.Piece.UID} Killed");
             toTile.Piece = pieceToMove;
             fromTile.Piece = null;
             pieceToMove.Position = to;
@@ -214,7 +224,7 @@ namespace Castling.Server
             //    (pieceToMove as Rook).SetHasMoved(true);
             //}
 
-            Debug.Log($"Moved {pieceToMove.Type} to {to}");
+            Debug.Log($"Moved {pieceToMove.UID} to {to}");
             return true;
         }
 
