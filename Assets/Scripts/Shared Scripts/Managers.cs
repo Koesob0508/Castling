@@ -53,7 +53,8 @@ public class Managers : MonoBehaviour
 
     public async void StartClient()
     {
-        var data = await RelayManager.JoinRelay(InputJoinCode.text, "production");
+        Debug.Log($"Join Code : {InputJoinCode.text}");
+        var data = await RelayManager.JoinRelay(InputJoinCode.text, "development");
         NetworkManager.Singleton.GetComponent<UnityTransport>().SetRelayServerData(data.IPv4Address, data.Port, data.AllocationIdBytes, data.Key, data.ConnectionData);
         NetworkManager.Singleton.StartClient();
 
@@ -68,10 +69,11 @@ public class Managers : MonoBehaviour
 
     public async void StartHost()
     {
-        var data = await RelayManager.SetupRelay(10, "production");
+        var data = await RelayManager.SetupRelay(10, "development");
         NetworkManager.Singleton.GetComponent<UnityTransport>().SetRelayServerData(data.IPv4Address, data.Port, data.AllocationIdBytes, data.Key, data.ConnectionData);
         NetworkManager.Singleton.StartHost();
         ShowJoinCode.text = data.JoinCode;
+        Debug.Log($"Join Code : {ShowJoinCode.text}");
         Debug.Log("이제부터 이 컴퓨터는 Host입니다.");
     }
 
