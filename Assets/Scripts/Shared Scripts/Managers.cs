@@ -55,7 +55,7 @@ public class Managers : MonoBehaviour
     {
         Debug.Log($"Join Code : {InputJoinCode.text}");
         var data = await RelayManager.JoinRelay(InputJoinCode.text, "development");
-        NetworkManager.Singleton.GetComponent<UnityTransport>().SetRelayServerData(data.IPv4Address, data.Port, data.AllocationIdBytes, data.Key, data.ConnectionData);
+        NetworkManager.Singleton.GetComponent<UnityTransport>().SetRelayServerData(data.IPv4Address, data.Port, data.AllocationIdBytes, data.Key, data.ConnectionData, data.HostConnectionData);
         NetworkManager.Singleton.StartClient();
 
         string cleanedJoinCode = RelayManager.CleanJoinCode(InputJoinCode.text);
