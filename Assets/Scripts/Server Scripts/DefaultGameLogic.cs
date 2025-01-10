@@ -199,7 +199,10 @@ namespace Castling.Server
             GameData.Board.Pieces.Clear();
             foreach (var tile in GameData.Board.Tiles)
             {
-                GameData.Board.Pieces.Add(tile.Piece);
+                if (tile.Piece != null)
+                {
+                    GameData.Board.Pieces.Add(tile.Piece);
+                }
             }
 
             //if (pieceToMove is King)
