@@ -1,6 +1,7 @@
 using Castling.Server;
 using Castling.Shared;
 using NUnit.Framework;
+using UnityEngine;
 using UnityEngine.TestTools;
 
 namespace Castling.Tests
@@ -82,6 +83,54 @@ namespace Castling.Tests
 
             // GameData가 null인지 확인
             Assert.IsNull(gameLogic.GameData, "여러 번 Init 호출 후에도 Clear는 GameData를 null로 설정해야 합니다.");
+        }
+
+        [Test]
+        public void TryMovePiece_CaptureEnemyPiece_ShouldUpdateBoardCorrectly()
+        {
+            // Arrange
+            gameLogic.Init();
+
+            string blackRookUID = "black_rook_test";
+            string whiteQueenUID = "white_queen_test";
+            Vector2Int capturePosition = new Vector2Int(4, 6);
+
+            // Setup: 이동을 위해 백 퀸을 임의 위치에 배치 (테스트 목적)
+            Piece whiteQueen = new Queen
+            {
+                Color = TeamColor.White,
+                Type = PieceType.Queen,
+                UID = whiteQueenUID,
+                Position = capturePosition
+            };
+
+            Vector2Int startPosition = new Vector2Int(4, 2);
+
+            Piece blackRook = new Rook
+            {
+                Color = TeamColor.Black,
+                Type = PieceType.Rook,
+                UID = blackRookUID,
+                Position = startPosition
+            };
+            gameLogic.GameData.Board.Tiles[capturePosition.x, capturePosition.y].Piece = whiteQueen;
+            gameLogic.GameData.Board.Pieces.Add(whiteQueen);
+            gameLogic.GameData.Board.Tiles[startPosition.x, startPosition.y].Piece = blackRook;
+            gameLogic.GameData.Board.Pieces.Add(blackRook);
+            // Act
+            gameLogic.TryMovePiece(blackRookUID, capturePosition.x, capturePosition.y);
+
+            // Assert
+            Assert.IsNull(gameLogic.GameData.Board.Tiles[startPosition.x, startPosition.y].Piece,
+                "Black rook should have moved.");
+            Assert.IsFalse(gameLogic.GameData.Board.Tiles[capturePosition.x, capturePosition.y].Piece?.UID == whiteQueenUID,
+                          "White queen should have been captured.");
+            Assert.IsNotNull(gameLogic.GameData.Board.Tiles[capturePosition.x, capturePosition.y].Piece,
+                             "Black pawn should have moved to the capture position.");
+            Assert.AreEqual(blackRookUID, gameLogic.GameData.Board.Tiles[capturePosition.x, capturePosition.y].Piece.UID,
+                            "Black pawn's UID should match after moving.");
+            Assert.False(gameLogic.GameData.Board.Pieces.Exists(piece => piece?.UID == whiteQueenUID),
+                         "White queen should no longer exist in the board pieces list.");
         }
     }
 }

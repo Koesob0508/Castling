@@ -196,6 +196,12 @@ namespace Castling.Server
             fromTile.Piece = null;
             pieceToMove.Position = to;
 
+            GameData.Board.Pieces.Clear();
+            foreach (var tile in GameData.Board.Tiles)
+            {
+                GameData.Board.Pieces.Add(tile.Piece);
+            }
+
             //if (pieceToMove is King)
             //{
             //    (pieceToMove as King).SetHasMoved(true);
